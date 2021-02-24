@@ -30,9 +30,10 @@
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-material.css";
 import { AgGridVue } from 'ag-grid-vue';
+// import { getAge } from '@/utils/date.js';
 
 export default {
-  name: 'competitors',
+  name: 'competition',
   components: {
     AgGridVue
   },
@@ -46,7 +47,10 @@ export default {
       gridOptions: {
         suppressRowTransform: true,     
         suppressCellSelection: true,
-        overlayNoRowsTemplate: 'No data available',
+        overlayNoRowsTemplate: 'No competitors found',
+        components: {
+          countryCellRenderer: countryCellRenderer
+        }
       },
       frameworkComponents: null,
       data: {
@@ -66,20 +70,17 @@ export default {
 
     this.columnDefs = [
       { 
-        headerName: 'Rank',
-        field: 'rank',
-        editable: false,
-        sortable: true,
-        pinned: false,
-        width: 150,
-        maxWidth: 200,
-        suppressMovable: true,
-        cellStyle: {'font-weight': 'bold'}
+        headerName: 'Firstname', 
+        field: 'firstname', 
+        width: 400,
+        editable: false, 
+        sortable: false, 
+        suppressMovable: true 
       },
       { 
-        headerName: 'Name', 
-        field: 'name', 
-        maxWidth: 400,
+        headerName: 'Lastname', 
+        field: 'lastname', 
+        width: 400,
         editable: false, 
         sortable: false, 
         suppressMovable: true 
@@ -87,51 +88,86 @@ export default {
       { 
         headerName: 'Nationality', 
         field: 'nationality', 
-        maxWidth: 200,
+        width: 200,
         editable: false, 
         sortable: false, 
-        suppressMovable: true 
+        suppressMovable: true,
+        cellRenderer: 'countryCellRenderer',
       },
       { 
-        headerName: 'Gender',
-        field: 'gender',
-        maxWidth: 100,
+        headerName: 'Age',
+        field: 'birthdate',
+        width: 100,
         editable: false,
         sortable: false,
         suppressMovable: true,
+        valueFormatter:  function(params) {
+          // TODO: Move in a function
+          var today = new Date();
+          var birthDate = new Date(params.value);
+          var age = today.getFullYear() - birthDate.getFullYear();
+          var m = today.getMonth() - birthDate.getMonth();
+          if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) 
+          {
+              age--;
+          }
+          return age;
+        }
       },
       { 
-        headerName: 'Points',
-        field: 'points',
-        maxWidth: 100,
-        editable: false,
-        sortable: false,
+        headerName: 'Gender', 
+        field: 'gender', 
+        width: 200,
+        editable: false, 
+        sortable: false, 
+        suppressMovable: true
+      },
+      { 
+        headerName: 'Height', 
+        field: 'height', 
+        width: 200,
+        editable: false, 
+        sortable: false, 
         suppressMovable: true,
+        valueFormatter:  function(params) {
+          return params.value + ' cm';
+        }
       },
       { 
-        headerName: 'Wod #1', 
-        field: 'wod_1', 
-        width: 300,
+        headerName: 'Weight', 
+        field: 'weight', 
+        width: 200,
         editable: false, 
-        sortable: true, 
-        suppressMovable: true 
+        sortable: false, 
+        suppressMovable: true,
+        valueFormatter:  function(params) {
+          return params.value + ' kg';
+        }
       },
       { 
-        headerName: 'Wod #2', 
-        field: 'wod_2', 
-        width: 300,
+        headerName: 'Profile', 
+        field: 'profile', 
+        width: 200,
         editable: false, 
-        sortable: true, 
-        suppressMovable: true 
-      },      
-      { 
-        headerName: 'Wod #3', 
-        field: 'wod_3', 
-        width: 300,
-        editable: false, 
-        sortable: true, 
-        suppressMovable: true 
-      },
+        sortable: false, 
+        suppressMovable: true,
+        cellRenderer: (params) => {
+          const route = {
+            name: "competitor-profile",
+            params: { id: params.data.id }
+          };
+
+          const link = document.createElement("a");
+          link.href = this.$router.resolve(route).href;
+          link.innerText = "View";
+          // link.innerText = params.value;
+          link.addEventListener("click", e => {
+            e.preventDefault();
+            this.$router.push(route);
+          });
+          return link;
+        }
+      }
     ];
     this.rowData = [
     ];
@@ -142,15 +178,46 @@ export default {
     generate() {
      
     },
-
     generateFakeData() {
       this.rowData = [
-        { rank: 1, name: 'Julien Courtès', nationality: 'France', gender: 'Male', points: 1500, wod_1: '1st', wod_2: '1st', wod_3: '1st' },
-        { rank: 2, name: 'Jean Boudet', nationality: 'France', gender: 'Male', points: 0, wod_1: 'last', wod_2: 'last', wod_3: 'last' }
+        { firstname: 'John', lastname: 'Doe', nationality: 'France', gender: 'Male', birthdate: '1990-05-01', height: 179, weight: 80 },
+        { firstname: 'Jean', lastname: 'Crapaud', nationality: 'France', gender: 'Male', birthdate: '1991-05-01', height: 174, weight: 65},
       ];
     }
   }
 };
+
+function countryCellRenderer(params) {
+    //get flags from here: http://www.freeflagicons.com/
+    var COUNTRY_CODES = {
+        Ireland: "ie",
+        Luxembourg: "lu",
+        Belgium: "be",
+        Spain: "es",
+        "United Kingdom": "gb",
+        France: "fr",
+        Germany: "de",
+        Sweden: "se",
+        Italy: "it",
+        Greece: "gr",
+        Iceland: "is",
+        Portugal: "pt",
+        Malta: "mt",
+        Norway: "no",
+        Brazil: "br",
+        Argentina: "ar",
+        Colombia: "co",
+        Peru: "pe",
+        Venezuela: "ve",
+        Uruguay: "uy"
+    };
+    if (params.value === "" || params.value === undefined || params.value === null) {
+        return '';
+    } else {
+        var flag = '<img class="flag" border="0" width="15" height="10" src="https://flags.fmcdn.net/data/flags/mini/' + COUNTRY_CODES[params.value] + '.png">';
+        return flag + ' ' + params.value;
+    }
+}
 
 </script>
 
