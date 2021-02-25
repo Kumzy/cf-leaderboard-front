@@ -55,7 +55,7 @@ export default {
           month: 2,
           day: 16
         }
-      },
+      }
     };
   },
   created() {
@@ -142,7 +142,6 @@ export default {
     generate() {
      
     },
-
     generateFakeData() {
       this.rowData = [
         { rank: 1, name: 'Julien Courtès', nationality: 'France', gender: 'Male', points: 1500, wod_1: '1st', wod_2: '1st', wod_3: '1st' },

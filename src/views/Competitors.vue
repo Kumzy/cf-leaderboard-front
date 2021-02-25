@@ -1,26 +1,75 @@
 <template>
-  <div class="about">
+  <div>
     <h1>Competitors</h1>
 
     <div class="filter-container">
-      
-      <v-btn
-      depressed
-      :loading="calculateLoading"
-      color="primary"
-      @click="generateFakeData"
-    >
-      Generate fake data
-    </v-btn>
 
-      <ag-grid-vue
-        id="competitors"
-        class="ag-theme-material"
-        :columnDefs="columnDefs"
-        :domLayout="domLayout"
-        :rowData="rowData"
-        :gridOptions="gridOptions">
-        </ag-grid-vue>
+      <v-row align="center">
+        <!-- Left group -->
+        <v-col 
+          class="d-flex"
+          cols="12"
+          sm="3"
+        >
+          <v-text-field
+            v-model="search"
+            label="Search for a competitor"
+            solo
+            dense
+            :prepend-inner-icon="searchIcon"
+            clearable
+          >
+          </v-text-field>
+          
+        </v-col>
+
+        <!-- Right group -->
+        <v-col class="text-right">
+          <v-btn
+            class="text-none"
+            :loading="calculateLoading"
+            color="secondary"
+            @click="generateFakeData"
+          >
+            Generate fake data
+          </v-btn>
+
+          <!-- Button refresh -->
+          <v-btn
+            :loading="refreshLoading"
+            :disabled="refreshLoading"
+            color="blue-grey"
+            class="text-none ml-4 white--text"
+            @click="refreshData"
+          >
+            Refresh
+            <v-icon
+              right
+              dark
+            >
+              {{ refreshIcon }}
+            </v-icon>
+          </v-btn>
+
+          <!-- Button add -->
+          <v-btn
+            class="text-none ml-4"
+            color="primary"
+          >Add</v-btn> 
+           
+        </v-col>
+      </v-row>
+
+    <ag-grid-vue
+      id="competitorsGrid"
+      style="width: 100%;"
+      class="ag-theme-material"
+      :columnDefs="columnDefs"
+      :domLayout="domLayout"
+      :rowData="rowData"
+      :gridOptions="gridOptions">
+      <!-- :frameworkComponents="frameworkComponents"> -->
+      </ag-grid-vue>
     </div>
   </div>
 
@@ -30,7 +79,9 @@
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-material.css";
 import { AgGridVue } from 'ag-grid-vue';
+import btnCellRenderer from '@/renderers/BtnCellRenderer.vue';
 // import { getAge } from '@/utils/date.js';
+import { mdiMagnify, mdiRefresh } from '@mdi/js'
 
 export default {
   name: 'competition',
@@ -40,19 +91,27 @@ export default {
   data() {
     return {
       calculateLoading: false,
+      searchIcon: mdiMagnify,
+      refreshIcon: mdiRefresh,
+      refreshLoading: false,
       align:'start',
       justify:'start',
       columnDefs: null,
       rowData: null,
+      search: null,
+      gridApi: null,
       gridOptions: {
         suppressRowTransform: true,     
         suppressCellSelection: true,
         overlayNoRowsTemplate: 'No competitors found',
         components: {
-          countryCellRenderer: countryCellRenderer
+          countryCellRenderer: countryCellRenderer,
+          // btnCellRenderer: BtnCellRenderer
         }
       },
-      frameworkComponents: null,
+      // frameworkComponents:{
+      //   btnCellRenderer: BtnCellRenderer,
+      // },
       data: {
         week: {
           year: 2021,
@@ -60,10 +119,17 @@ export default {
           day: 16
         }
       },
+      genders:['All','Male','Female']
     };
   },
   created() {
-
+    window.addEventListener("resize", this.windowResized);
+  },
+  destroyed() {
+    window.removeEventListener("resize", this.windowResized);
+  },
+  mounted() {
+    this.gridApi = this.gridOptions.api;
   },
   beforeMount() {
     this.domLayout = 'autoHeight';
@@ -73,24 +139,30 @@ export default {
         headerName: 'Firstname', 
         field: 'firstname', 
         width: 400,
+        minWidth: 100,
         editable: false, 
-        sortable: false, 
+        sortable: true, 
+        resizable:true,
         suppressMovable: true 
       },
       { 
         headerName: 'Lastname', 
         field: 'lastname', 
         width: 400,
+        minWidth: 100,
         editable: false, 
-        sortable: false, 
+        sortable: true, 
+        resizable:true,
         suppressMovable: true 
       },
       { 
         headerName: 'Nationality', 
         field: 'nationality', 
         width: 200,
+        minWidth: 100,
         editable: false, 
         sortable: false, 
+        resizable:true,
         suppressMovable: true,
         cellRenderer: 'countryCellRenderer',
       },
@@ -98,8 +170,10 @@ export default {
         headerName: 'Age',
         field: 'birthdate',
         width: 100,
+        minWidth: 80,
         editable: false,
-        sortable: false,
+        sortable: true,
+        resizable:true,
         suppressMovable: true,
         valueFormatter:  function(params) {
           // TODO: Move in a function
@@ -118,16 +192,20 @@ export default {
         headerName: 'Gender', 
         field: 'gender', 
         width: 200,
+        minWidth: 80,
         editable: false, 
         sortable: false, 
+        resizable:true,
         suppressMovable: true
       },
       { 
         headerName: 'Height', 
         field: 'height', 
         width: 200,
+        minWidth: 100,
         editable: false, 
-        sortable: false, 
+        sortable: true, 
+        resizable:true,
         suppressMovable: true,
         valueFormatter:  function(params) {
           return params.value + ' cm';
@@ -137,8 +215,10 @@ export default {
         headerName: 'Weight', 
         field: 'weight', 
         width: 200,
+        minWidth: 100,
         editable: false, 
-        sortable: false, 
+        sortable: true, 
+        resizable:true,
         suppressMovable: true,
         valueFormatter:  function(params) {
           return params.value + ' kg';
@@ -148,25 +228,29 @@ export default {
         headerName: 'Profile', 
         field: 'profile', 
         width: 200,
+        minWidth: 170,
         editable: false, 
         sortable: false, 
+        resizable:true,
         suppressMovable: true,
-        cellRenderer: (params) => {
-          const route = {
-            name: "competitor-profile",
-            params: { id: params.data.id }
-          };
+        cellRendererFramework: btnCellRenderer,
 
-          const link = document.createElement("a");
-          link.href = this.$router.resolve(route).href;
-          link.innerText = "View";
-          // link.innerText = params.value;
-          link.addEventListener("click", e => {
-            e.preventDefault();
-            this.$router.push(route);
-          });
-          return link;
-        }
+        // cellRenderer: (params) => {
+        //   const route = {
+        //     name: "competitor-profile",
+        //     params: { id: params.data.id }
+        //   };
+
+        //   const link = document.createElement("a");
+        //   link.href = this.$router.resolve(route).href;
+        //   link.innerText = "View";
+        //   // link.innerText = params.value;
+        //   link.addEventListener("click", e => {
+        //     e.preventDefault();
+        //     this.$router.push(route);
+        //   });
+        //   return link;
+        // }
       }
     ];
     this.rowData = [
@@ -175,6 +259,14 @@ export default {
     
   },
   methods: {
+    windowResized() {
+      this.gridApi.sizeColumnsToFit();
+    },
+    refreshData() {
+      this.refreshLoading = true;
+      // setTimeout(() => (this.refreshLoading = false), 3000)
+      setTimeout(() => this.refreshLoading = false, 2000);
+    },
     generate() {
      
     },
@@ -183,6 +275,7 @@ export default {
         { firstname: 'John', lastname: 'Doe', nationality: 'France', gender: 'Male', birthdate: '1990-05-01', height: 179, weight: 80 },
         { firstname: 'Jean', lastname: 'Crapaud', nationality: 'France', gender: 'Male', birthdate: '1991-05-01', height: 174, weight: 65},
       ];
+      this.gridApi.sizeColumnsToFit();
     }
   }
 };
