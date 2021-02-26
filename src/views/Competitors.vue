@@ -18,6 +18,7 @@
             dense
             :prepend-inner-icon="searchIcon"
             clearable
+            @input="searchGrid"
           >
           </v-text-field>
           
@@ -27,6 +28,7 @@
         <v-col class="text-right">
           <v-btn
             class="text-none"
+            style="letter-spacing: normal;"
             :loading="calculateLoading"
             color="secondary"
             @click="generateFakeData"
@@ -40,6 +42,7 @@
             :disabled="refreshLoading"
             color="blue-grey"
             class="text-none ml-4 white--text"
+            style="letter-spacing: normal;"
             @click="refreshData"
           >
             Refresh
@@ -54,6 +57,7 @@
           <!-- Button add -->
           <v-btn
             class="text-none ml-4"
+            style="letter-spacing: normal;"
             color="primary"
           >Add</v-btn> 
            
@@ -234,23 +238,6 @@ export default {
         resizable:true,
         suppressMovable: true,
         cellRendererFramework: btnCellRenderer,
-
-        // cellRenderer: (params) => {
-        //   const route = {
-        //     name: "competitor-profile",
-        //     params: { id: params.data.id }
-        //   };
-
-        //   const link = document.createElement("a");
-        //   link.href = this.$router.resolve(route).href;
-        //   link.innerText = "View";
-        //   // link.innerText = params.value;
-        //   link.addEventListener("click", e => {
-        //     e.preventDefault();
-        //     this.$router.push(route);
-        //   });
-        //   return link;
-        // }
       }
     ];
     this.rowData = [
@@ -269,6 +256,9 @@ export default {
     },
     generate() {
      
+    },
+    searchGrid() {
+      this.gridApi.setQuickFilter(this.search);
     },
     generateFakeData() {
       this.rowData = [
