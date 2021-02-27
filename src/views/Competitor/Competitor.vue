@@ -1,6 +1,6 @@
 <template>
     <v-container fluid>
-        <h1>{{ editing ? 'Edit' : 'Add' }} Competitor</h1>
+        <h1>{{ editing ? 'Edit' : 'Add' }} competitor</h1>
         <v-layout column>
             <v-card flat rounded="0">
                 <v-card-title>
@@ -10,6 +10,24 @@
                   <v-row justify="center">
                     <v-col class="col-md-6 col-12">
                       <v-form>
+                        <v-row justify="center" align="center">
+                          <avataaars
+                            :width="widthAvatar"
+                            :height="heightAvatar"
+                            :avatarOptions="form.avatarOptions"
+                          ></avataaars>
+                          
+                          <v-btn
+                            class="text-none"
+                            depressed     
+                            color="primary"
+                            @click="changeAvatar"
+                            >
+                            Modify avatar
+                          </v-btn>
+                        </v-row>
+                        <modal-avatar ref="avatarModal"></modal-avatar>
+
                         <!-- Firstnaùe -->
                         <v-text-field
                           outlined
@@ -111,7 +129,6 @@
                           <v-btn
                             class="text-none"
                             depressed
-                            flat
                             outlined
                             color="primary"
                             @click="previous"
@@ -121,17 +138,17 @@
                           <v-spacer></v-spacer>
                           <v-btn
                             class="text-none"
-                            flat
                             depressed
                             color="primary"
+                            @click="handleActionButton"
                           >
                             <v-icon
                               left
                               dark
                             >
-                              {{ saveIcon }}
+                              {{ editing ? saveIcon : accountCreateIcon }}
                             </v-icon>
-                            Save
+                            {{ editing ? 'Save' : 'Create' }}
                           </v-btn>
                         </v-row>
                       </v-form>
@@ -144,33 +161,43 @@
 </template>
 
 <script>
-import { mdiWeight, mdiHumanMaleHeight, mdiCalendar, mdiGenderMaleFemale, mdiEarth, mdiAccount, mdiContentSave } from '@mdi/js'
+import { mdiWeight, mdiHumanMaleHeight, mdiCalendar, mdiGenderMaleFemale, mdiEarth, mdiAccount, mdiContentSave, mdiAccountPlus } from '@mdi/js'
+import ModalAvatar from '@/components/avatar/ModalAvatar.vue'
+import Avataaars from 'vue-avataaars'
+
 export default {
   name: 'competitor',
+  components: {
+    ModalAvatar,
+    Avataaars
+  },
   data() {
     return {
         loading: false,
         saveIcon: mdiContentSave,
         accountIcon: mdiAccount,
         calendarIcon: mdiCalendar,
+        accountCreateIcon: mdiAccountPlus,
         heightIcon: mdiHumanMaleHeight,
         weightIcon: mdiWeight,
         genderIcon: mdiGenderMaleFemale,
         nationalityIcon: mdiEarth,
         menu: null,
+        widthAvatar: 200,
+        heightAvatar: 200,
         form: {
-            firstName: 'John',
-            lastName: 'Doe',
+            firstName: '',
+            lastName: '',
             nationality: {
-              name: "France"
+              name: ''
             },
-            birthday_date: '1990-05-01',
+            birthday_date: '',
             gender: {
-              name: 'Male'
+              name: ''
             },
-            height: 179,
-            weight: 80,
-            avatar: 'MALE_CAUCASIAN_BLOND_BEARD'
+            height: 0,
+            weight: 0,
+            avatarOptions: null
         },
     };
   },
@@ -190,10 +217,28 @@ export default {
     },
     handleActionButton() {
       // Handle the action button
+      if ( this.editing && this.editing == true ) {
+        this.updateCompetitor()
+      } else {
+        this.createCompetitor()
+      }
     },
     createCompetitor() {
-      // Create a competitor
+      // Create a competitor (called by handleActionButton method)
     },
+    updateCompetitor() {
+      // Update a competitor (called by handleActionButton method)
+    },
+    changeAvatar() {
+      // Open a dialog to change the avatar
+      this.$refs.avatarModal
+        .open(this.form.avatarOptions)
+        .then((resolve) => {
+          if (resolve == true) {
+            this.form.avatarOptions = this.$refs.avatarModal.avatarOptions
+          }
+        })
+    }
   }
 };
 
