@@ -45,13 +45,13 @@
             style="letter-spacing: normal;"
             @click="refreshData"
           >
-            Refresh
             <v-icon
-              right
+              left
               dark
             >
               {{ refreshIcon }}
             </v-icon>
+            Refresh
           </v-btn>
 
           <!-- Button add -->
@@ -59,7 +59,15 @@
             class="text-none ml-4"
             style="letter-spacing: normal;"
             color="primary"
-          >Add</v-btn> 
+          >
+            <v-icon
+              left
+              dark
+            >
+              {{ addAccountIcon }}
+            </v-icon>
+            Add
+          </v-btn> 
            
         </v-col>
       </v-row>
@@ -85,7 +93,7 @@ import "ag-grid-community/dist/styles/ag-theme-material.css";
 import { AgGridVue } from 'ag-grid-vue';
 import btnCellRenderer from '@/renderers/BtnCellRenderer.vue';
 // import { getAge } from '@/utils/date.js';
-import { mdiMagnify, mdiRefresh } from '@mdi/js'
+import { mdiMagnify, mdiRefresh, mdiAccountPlus } from '@mdi/js'
 
 export default {
   name: 'competition',
@@ -95,6 +103,7 @@ export default {
   data() {
     return {
       calculateLoading: false,
+      addAccountIcon: mdiAccountPlus,
       searchIcon: mdiMagnify,
       refreshIcon: mdiRefresh,
       refreshLoading: false,
@@ -262,8 +271,8 @@ export default {
     },
     generateFakeData() {
       this.rowData = [
-        { firstname: 'John', lastname: 'Doe', nationality: 'France', gender: 'Male', birthdate: '1990-05-01', height: 179, weight: 80 },
-        { firstname: 'Jean', lastname: 'Crapaud', nationality: 'France', gender: 'Male', birthdate: '1991-05-01', height: 174, weight: 65},
+        { id: 1, firstname: 'John', lastname: 'Doe', nationality: 'France', gender: 'Male', birthdate: '1990-05-01', height: 179, weight: 80 },
+        { id: 2, firstname: 'Jean', lastname: 'Crapaud', nationality: 'France', gender: 'Male', birthdate: '1991-05-01', height: 174, weight: 65},
       ];
       this.gridApi.sizeColumnsToFit();
     }

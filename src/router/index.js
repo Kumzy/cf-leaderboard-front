@@ -27,7 +27,18 @@ const routes = [
     path: '/competitors',
     name: 'Competitors',
     component: () => import('@/views/Competitors.vue')
+  },
+  {
+    path: '/competitors/:id',
+    name: 'competitor',
+    component: () => import('@/views/Competitor/Competitor.vue'),
+  },
+  {
+    path: '/competitors/add',
+    name: 'competitor',
+    component: () => import('@/views/Competitor/Competitor.vue'),
   }
+  
 ]
 
 const router = new VueRouter({

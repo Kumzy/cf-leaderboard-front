@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="dialog" persistent max-width="600" @keydown.esc="dialog = false">
+    <v-dialog v-model="dialog" persistent max-width="540" @keydown.esc="dialog = false">
       <v-card align="left">
         
         <v-card-title class="headline">Confirm deletion

@@ -36,7 +36,7 @@ export default Vue.extend({
     btnViewClickedHandler() {
       // Check that we have something in the row data and calling the route for competitor profile
       if (this.params && this.params.data && this.params.data.id) {
-        this.$router.push({ name: 'competitor_profile', params: { id: this.params.data.id } });
+        this.$router.push({ name: 'competitor', params: { id: this.params.data.id } });
       }
     },
     btnDeleteClickedHandler() {
@@ -49,23 +49,4 @@ export default Vue.extend({
     }
   }
 });
-// export default {
-//   name: 'BtnCellRenderer',
-//   data() {
-//     return {
-//     }
-//   }
-// }
 </script>
-// export default Vue.extend({
-//     template: `
-//           <span>
-//               <v-btn @click="btnClickedHandler()">Click me!</button>
-//           </span>
-//       `,
-//     methods: {
-//       btnClickedHandler() {
-//         this.params.clicked(this.params.value);
-//       }
-//     },
-// });
