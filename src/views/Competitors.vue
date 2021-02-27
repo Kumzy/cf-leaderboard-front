@@ -59,6 +59,7 @@
             class="text-none ml-4"
             style="letter-spacing: normal;"
             color="primary"
+            @click="addCompetitor"
           >
             <v-icon
               left
@@ -268,6 +269,9 @@ export default {
     },
     searchGrid() {
       this.gridApi.setQuickFilter(this.search);
+    },
+    addCompetitor() {
+      this.$router.push({ name: 'competitor_add' })
     },
     generateFakeData() {
       this.rowData = [

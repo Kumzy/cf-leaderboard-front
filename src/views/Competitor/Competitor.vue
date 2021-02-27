@@ -1,6 +1,6 @@
 <template>
     <v-container fluid>
-        <h1>Competitor</h1>
+        <h1>{{ editing ? 'Edit' : 'Add' }} Competitor</h1>
         <v-layout column>
             <v-card flat rounded="0">
                 <v-card-title>
@@ -174,6 +174,9 @@ export default {
         },
     };
   },
+  props: {
+    editing: Boolean,
+  },
   methods: {
      openAvatarPicker() {
         this.showAvatarPicker = true
@@ -184,6 +187,12 @@ export default {
     },
     saveBirthdayDate(date) {
       this.$refs.menu.save(date)
+    },
+    handleActionButton() {
+      // Handle the action button
+    },
+    createCompetitor() {
+      // Create a competitor
     },
   }
 };

@@ -32,11 +32,13 @@ const routes = [
     path: '/competitors/:id',
     name: 'competitor',
     component: () => import('@/views/Competitor/Competitor.vue'),
+    props: { editing: true }
   },
   {
     path: '/competitors/add',
-    name: 'competitor',
+    name: 'competitor_add',
     component: () => import('@/views/Competitor/Competitor.vue'),
+    props: { editing: false }
   }
   
 ]
