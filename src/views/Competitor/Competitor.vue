@@ -11,11 +11,11 @@
                     <v-col class="col-md-6 col-12">
                       <v-form>
                         <v-row justify="center" align="center">
-                          <avataaars
+                          <Avataaars
                             :width="widthAvatar"
                             :height="heightAvatar"
                             :avatarOptions="form.avatarOptions"
-                          ></avataaars>
+                          ></Avataaars>
                           
                           <v-btn
                             class="text-none"
@@ -26,9 +26,9 @@
                             Modify avatar
                           </v-btn>
                         </v-row>
-                        <modal-avatar ref="avatarModal"></modal-avatar>
+                        <ModalAvatar ref="avatarModal"></ModalAvatar>
 
-                        <!-- Firstnaùe -->
+                        <!-- Firstname -->
                         <v-text-field
                           outlined
                           :prepend-icon="accountIcon"
@@ -47,13 +47,21 @@
                         </v-text-field>
 
                         <!-- Nationality -->
-                        <v-text-field
+                        <v-autocomplete
                           outlined
+                          :items="countries"
                           :prepend-icon="nationalityIcon"
-                          v-model="form.nationality.name"
-                          label="Nationality"
-                          class="mb-4">
-                        </v-text-field>
+                          item-text="name"
+                          item-value="code"
+                          clearable
+                        >
+                          <template v-slot:item="data">
+                            <v-list-item-avatar tile>
+                              <v-img max-width="20" max-height="15" :src="getCountryFlag(data.item.code)"></v-img>
+                            </v-list-item-avatar>
+                            <v-list-item-content v-text="data.item.name"></v-list-item-content>
+                          </template>
+                        </v-autocomplete>
 
                         <!-- Birth date -->
                         <v-menu
@@ -163,7 +171,9 @@
 <script>
 import { mdiWeight, mdiHumanMaleHeight, mdiCalendar, mdiGenderMaleFemale, mdiEarth, mdiAccount, mdiContentSave, mdiAccountPlus } from '@mdi/js'
 import ModalAvatar from '@/components/avatar/ModalAvatar.vue'
+import { putCompetitor } from '@/api/competitor'
 import Avataaars from 'vue-avataaars'
+import countries from '@/data/countries'
 
 export default {
   name: 'competitor',
@@ -174,6 +184,7 @@ export default {
   data() {
     return {
         loading: false,
+        countries: countries,
         saveIcon: mdiContentSave,
         accountIcon: mdiAccount,
         calendarIcon: mdiCalendar,
@@ -205,7 +216,10 @@ export default {
     editing: Boolean,
   },
   methods: {
-     openAvatarPicker() {
+    getCountryFlag(code) {
+      return "https://flags.fmcdn.net/data/flags/mini/" + code.toLowerCase()  + ".png";
+    },
+    openAvatarPicker() {
         this.showAvatarPicker = true
     },
     previous() {
@@ -228,6 +242,10 @@ export default {
     },
     updateCompetitor() {
       // Update a competitor (called by handleActionButton method)
+      putCompetitor(this.form).then(response => {
+        console.log(response);
+        this.$router.push({name: 'competitors'})
+      })
     },
     changeAvatar() {
       // Open a dialog to change the avatar

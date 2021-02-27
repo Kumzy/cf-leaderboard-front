@@ -7,7 +7,7 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    name: 'Home',
+    name: 'home',
     component: Home
   },
   {
@@ -20,12 +20,12 @@ const routes = [
   },
   {
     path: '/competition',
-    name: 'Competition',
+    name: 'competition',
     component: () => import(/* webpackChunkName: "about" */ '@/views/Competition.vue')
   },
   {
     path: '/competitors',
-    name: 'Competitors',
+    name: 'competitors',
     component: () => import('@/views/Competitors.vue')
   },
   {

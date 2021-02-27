@@ -12,11 +12,11 @@ service.interceptors.request.use(
   config => {
     // do something before request is sent
     // console.log(this.$cookie.get('token'))
-    if (store.getters.token) {
+    //if (store.getters.token) {
       // let each request carry token
       // config.headers['Access-Control-Allow-Origin'] = '*'
       // config.headers['Authorization'] = 'Bearer ' + getToken()
-    }
+    // }
     return config
   },
   error => {
@@ -52,9 +52,9 @@ service.interceptors.response.use(
           cancelButtonText: 'Cancel',
           type: 'warning' */
         // }).then(() => {
-          store.dispatch('user/resetToken').then(() => {
-            location.reload()
-          })
+          // store.dispatch('user/resetToken').then(() => {
+          //   location.reload()
+          // })
         // })
       }
       return Promise.reject(new Error(res.message || 'Error'))

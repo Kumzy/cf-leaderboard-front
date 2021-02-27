@@ -7,3 +7,11 @@ export function getCompetitors(query) {
     params: query
   })
 }
+
+export function putCompetitor(data) {
+  return request({
+    url: '/api/competitor/'+data.id,
+    method: 'put',
+    data
+  })
+}
