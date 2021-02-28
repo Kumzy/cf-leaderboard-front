@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Competitors</h1>
+    <h1>Competitions</h1>
 
     <div class="filter-container">
 
@@ -50,22 +50,22 @@
             class="text-none ml-4"
             style="letter-spacing: normal;"
             color="primary"
-            @click="addCompetitor"
+            @click="addCompetition"
           >
             <v-icon
               left
               dark
             >
-              {{ addAccountIcon }}
+              {{ icons.plusIcon }}
             </v-icon>
-            Add
+            Create competition
           </v-btn> 
-           
+          <ModalCreateCompetition ref="createModal"></ModalCreateCompetition>
         </v-col>
       </v-row>
 
     <ag-grid-vue
-      id="competitorsGrid"
+      id="competitionsGrid"
       style="width: 100%;"
       class="ag-theme-material"
       :columnDefs="columnDefs"
@@ -85,18 +85,22 @@ import "ag-grid-community/dist/styles/ag-theme-material.css";
 import { AgGridVue } from 'ag-grid-vue';
 import btnCellRenderer from '@/renderers/BtnCellRenderer.vue';
 // import { getAge } from '@/utils/date.js';
-import { mdiMagnify, mdiRefresh, mdiAccountPlus } from '@mdi/js';
-import { getCompetitors } from '@/api/competitor';
+import { mdiMagnify, mdiRefresh, mdiPlus  } from '@mdi/js';
+import { getCompetitions } from '@/api/competition';
+import ModalCreateCompetition from '@/components/competition/ModalCreateCompetition.vue'
 
 export default {
-  name: 'competitors',
+  name: 'competitions',
   components: {
-    AgGridVue
+    AgGridVue,
+    ModalCreateCompetition
   },
   data() {
     return {
       calculateLoading: false,
-      addAccountIcon: mdiAccountPlus,
+      icons : {
+        plusIcon: mdiPlus
+      },
       searchIcon: mdiMagnify,
       refreshIcon: mdiRefresh,
       refreshLoading: false,
@@ -109,16 +113,9 @@ export default {
       gridOptions: {
         suppressRowTransform: true,     
         suppressCellSelection: true,
-        overlayNoRowsTemplate: 'No competitors found',
+        overlayNoRowsTemplate: 'No competitions found',
         components: {
           countryCellRenderer: countryCellRenderer,
-        }
-      },
-      data: {
-        week: {
-          year: 2021,
-          month: 2,
-          day: 16
         }
       },
       genders:['All','Male','Female']
@@ -127,7 +124,7 @@ export default {
   created() {
     // Link resize of window to the ag-grid
     window.addEventListener("resize", this.windowResized);
-    this.getCompetitors();
+    this.getCompetitions();
   },
   destroyed() {
     window.removeEventListener("resize", this.windowResized);
@@ -140,8 +137,8 @@ export default {
 
     this.columnDefs = [
       { 
-        headerName: 'Firstname', 
-        field: 'firstname', 
+        headerName: 'Name', 
+        field: 'name', 
         width: 400,
         minWidth: 100,
         editable: false, 
@@ -150,8 +147,8 @@ export default {
         suppressMovable: true 
       },
       { 
-        headerName: 'Lastname', 
-        field: 'lastname', 
+        headerName: 'Start date', 
+        field: 'start_date', 
         width: 400,
         minWidth: 100,
         editable: false, 
@@ -160,79 +157,28 @@ export default {
         suppressMovable: true 
       },
       { 
-        headerName: 'Nationality', 
-        field: 'nationality', 
+        headerName: '# Competitors', 
+        field: 'competitors_amount', 
         width: 200,
         minWidth: 100,
         editable: false, 
         sortable: false, 
         resizable:true,
         suppressMovable: true,
-        valueGetter: 'data.nationality.name',
-        cellRenderer: 'countryCellRenderer'
       },
       { 
-        headerName: 'Age',
-        field: 'birthday_date',
-        width: 100,
+        headerName: 'Categories',
+        field: 'categories',
+        width: 200,
         minWidth: 80,
         editable: false,
         sortable: true,
         resizable:true,
-        suppressMovable: true,
-        valueFormatter:  function(params) {
-          // TODO: Move in a function
-          var today = new Date();
-          var birthDate = new Date(params.value);
-          var age = today.getFullYear() - birthDate.getFullYear();
-          var m = today.getMonth() - birthDate.getMonth();
-          if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) 
-          {
-              age--;
-          }
-          return age;
-        }
+        suppressMovable: true
       },
       { 
-        headerName: 'Gender', 
-        field: 'gender', 
-        width: 200,
-        minWidth: 80,
-        editable: false, 
-        sortable: false, 
-        resizable:true,
-        suppressMovable: true,
-        valueGetter: 'data.gender.name',
-      },
-      { 
-        headerName: 'Height', 
-        field: 'height', 
-        width: 200,
-        minWidth: 100,
-        editable: false, 
-        sortable: true, 
-        resizable:true,
-        suppressMovable: true,
-        valueFormatter:  function(params) {
-          return params.value + ' cm';
-        }
-      },
-      { 
-        headerName: 'Weight', 
-        field: 'weight', 
-        width: 200,
-        minWidth: 100,
-        editable: false, 
-        sortable: true, 
-        resizable:true,
-        suppressMovable: true,
-        valueFormatter:  function(params) {
-          return params.value + ' kg';
-        }
-      },
-      { 
-        headerName: 'Profile', 
-        field: 'profile', 
+        headerName: 'Actions', 
+        field: 'actions', 
         width: 200,
         minWidth: 170,
         editable: false, 
@@ -250,25 +196,29 @@ export default {
     windowResized() {
       this.gridApi.sizeColumnsToFit();
     },
-    getCompetitors() {
+    getCompetitions() {
       this.refreshLoading = true;
-      getCompetitors().then(response => {
+      getCompetitions().then(response => {
         this.rowData = response.data.items
         this.gridApi.sizeColumnsToFit();
         this.refreshLoading = false
       })
     },
     refreshData() {
-      this.getCompetitors()
-    },
-    generate() {
-     
+      this.getCompetitions()
     },
     searchGrid() {
       this.gridApi.setQuickFilter(this.search);
     },
-    addCompetitor() {
-      this.$router.push({ name: 'competitor_add' })
+    addCompetition() {
+      // TODO: Show modal + on response, send post route
+      this.$refs.createModal
+        .open()
+        .then((resolve) => {
+          if (resolve && resolve === true) {
+            this.refreshData();
+          }
+        })
     }
   }
 };

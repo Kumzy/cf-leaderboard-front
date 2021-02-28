@@ -26,6 +26,7 @@
 <script>
 import Vue from "vue";
 import ModalDeleteCompetitor from '@/components/ModalDeleteCompetitor.vue'
+import { deleteCompetitor } from '@/api/competitor'
 
 export default Vue.extend({
   name: 'BtnCellRenderer',
@@ -42,9 +43,12 @@ export default Vue.extend({
     btnDeleteClickedHandler() {
       this.$refs.deleteModal
         .open(this.params.data.firstname, this.params.data.lastname)
-        .then((resolve, reject) => {
-          console.log(resolve)
-          console.log(reject)
+        .then((resolve) => {
+          if ( resolve && this.params.data && this.params.data.id && resolve == true) {
+            deleteCompetitor(this.params.data.id).then(response => {
+              console.log(response);
+            })
+          }
         })
     }
   }

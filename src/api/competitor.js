@@ -15,3 +15,10 @@ export function putCompetitor(data) {
     data
   })
 }
+
+export function deleteCompetitor(id) {
+  return request({
+    url: `/api/competitor/${id}`,
+    method: 'delete'
+  })
+}
