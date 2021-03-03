@@ -24,14 +24,14 @@ const routes = [
     component: () => import('@/views/Competition/Competitions.vue')
   },
   {
-    path: '/competition',
+    path: '/competition/:id',
     name: 'competition',
-    component: () => import(/* webpackChunkName: "about" */ '@/views/Competition.vue')
+    component: () => import(/* webpackChunkName: "about" */ '@/views/Competition/Competition.vue')
   },
   {
     path: '/competitors',
     name: 'competitors',
-    component: () => import('@/views/Competitors.vue')
+    component: () => import('@/views/Competitor/Competitors.vue')
   },
   {
     path: '/competitors/:id',

@@ -15,3 +15,10 @@ export function postCompetition(data) {
     data
   })
 }
+
+export function getCompetition(id) {
+  return request({
+    url: `/api/competition/${id}`,
+    method: 'get'
+  })
+}

@@ -83,7 +83,7 @@
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-material.css";
 import { AgGridVue } from 'ag-grid-vue';
-import btnCellRenderer from '@/renderers/BtnCellRenderer.vue';
+import btnCompetitionCellRenderer from '@/renderers/BtnCompetitionCellRenderer.vue';
 // import { getAge } from '@/utils/date.js';
 import { mdiMagnify, mdiRefresh, mdiPlus  } from '@mdi/js';
 import { getCompetitions } from '@/api/competition';
@@ -148,7 +148,7 @@ export default {
       },
       { 
         headerName: 'Start date', 
-        field: 'start_date', 
+        field: 'date_start', 
         width: 400,
         minWidth: 100,
         editable: false, 
@@ -185,7 +185,7 @@ export default {
         sortable: false, 
         resizable:true,
         suppressMovable: true,
-        cellRendererFramework: btnCellRenderer,
+        cellRendererFramework: btnCompetitionCellRenderer,
       }
     ];
     this.rowData = [
