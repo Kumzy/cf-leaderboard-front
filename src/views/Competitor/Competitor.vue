@@ -14,7 +14,7 @@
                           <Avataaars
                             :width="widthAvatar"
                             :height="heightAvatar"
-                            :avatarOptions="form.avatarOptions"
+                            :avatarOptions="form.avatar"
                           ></Avataaars>
                           
                           <v-btn
@@ -208,7 +208,7 @@ export default {
             },
             height: 0,
             weight: 0,
-            avatarOptions: null
+            avatar: null
         },
     };
   },
@@ -250,10 +250,10 @@ export default {
     changeAvatar() {
       // Open a dialog to change the avatar
       this.$refs.avatarModal
-        .open(this.form.avatarOptions)
+        .open(this.form.avatar)
         .then((resolve) => {
           if (resolve == true) {
-            this.form.avatarOptions = this.$refs.avatarModal.avatarOptions
+            this.form.avatar = this.$refs.avatarModal.avatarOptions
           }
         })
     }
