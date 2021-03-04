@@ -4,6 +4,7 @@
         <v-col cols="12" sm="4">
 
           <v-img
+            contain
             class="mt-10"
             :src="require('@/assets/logo_clapiers.png')"
           ></v-img>

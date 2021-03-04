@@ -111,13 +111,10 @@ export default {
         suppressRowTransform: true,     
         suppressCellSelection: true,
         overlayNoRowsTemplate: 'No competitors found',
-        // components: {
-        //   genderCellRenderer: genderCellRenderer,
-        // }
       },
       data: {},
       competition_id: null,
-      genders:['All','Male','Female']
+      genders: []
     };
   },
   created() {
@@ -145,8 +142,9 @@ export default {
         minWidth: 100,
         editable: false, 
         sortable: true, 
-        resizable:true,
-        suppressMovable: true 
+        resizable: true,
+        suppressMovable: true ,
+        headerTooltip: 'Determined by total points. The athlete with the fewest points wins.'
       },
       { 
         headerName: 'Name', 
@@ -154,7 +152,7 @@ export default {
         width: 400,
         minWidth: 100,
         editable: false, 
-        sortable: true, 
+        sortable: false, 
         resizable:true,
         suppressMovable: true 
       },
@@ -164,8 +162,8 @@ export default {
         width: 100,
         minWidth: 80,
         editable: false,
-        sortable: true,
-        resizable:true,
+        sortable: false,
+        resizable: true,
         suppressMovable: true,
         valueFormatter:  function(params) {
           // TODO: Move in a function
@@ -201,48 +199,19 @@ export default {
           const icon = document.createElement('v-icon', { props: { color: 'success', large: true } }, mdiGenderFemale);
           const span = document.createElement('span', { slot: 'badge' }, '5');
           return document.createElement('v-badge', propsObj, [span, icon]);
-          //var icon = `<v-icon>{{mdi-gender-female}}</v-icon>`
-          // var icon = document.createElement('v-icon', { props: { color: 'success' } }, 'mdi-gender-female');
-          //var icon = document.createElement('v-icon')
-          //icon.innerHTML = `{{mdiGenderFemale}}`//mdiGenderFemale
-          // return icon
-          // return document.createElement('v-icon', {
-          //   domProps: {
-          //     innerHTML: this.femaleIcon
-          //   }
-          // })
         }
       },
-      // { 
-      //   headerName: 'Wod #1', 
-      //   field: 'wod_1', 
-      //   width: 200,
-      //   minWidth: 170,
-      //   editable: false, 
-      //   sortable: false, 
-      //   resizable:true,
-      //   suppressMovable: true,
-      // },
-      // { 
-      //   headerName: 'Wod #2', 
-      //   field: 'wod_2', 
-      //   width: 200,
-      //   minWidth: 170,
-      //   editable: false, 
-      //   sortable: false, 
-      //   resizable:true,
-      //   suppressMovable: true,
-      // },
-      // { 
-      //   headerName: 'Wod #3', 
-      //   field: 'wod_3', 
-      //   width: 200,
-      //   minWidth: 170,
-      //   editable: false, 
-      //   sortable: false, 
-      //   resizable:true,
-      //   suppressMovable: true,
-      // }
+      { 
+        headerName: 'Points', 
+        field: 'points', 
+        width: 200,
+        minWidth: 100,
+        editable: false, 
+        sortable: false, 
+        resizable:true,
+        suppressMovable: true,
+        headerTooltip: 'The sum of an athlete\'s workout rankings. Based on a points-per-place ranking system.'
+      },
     ];
     this.rowData = [
     ];
@@ -259,10 +228,20 @@ export default {
         this.data = response.data.item;
         if (this.data.events.length > 0 ) {
           for(var i = 0; i < this.data.events.length; i++) {
-            this.columnDefs.push({ field: this.data.events[i].id, headerName: this.data.events[i].name, width: 200, minWidth: 170, editable: false, sortable: false, resizable:true, suppressMovable: true});
+            this.columnDefs.push({
+              field: this.data.events[i].id,
+              headerName: this.data.events[i].name,
+              width: 200,
+              minWidth: 170,
+              editable: false,
+              sortable: true,
+              resizable:true,
+              suppressMovable: true
+            });
           }
           this.gridOptions.api.setColumnDefs(this.columnDefs);
         }
+        this.rowData = this.data.competitors
         this.gridApi.sizeColumnsToFit();
         this.refreshLoading = false
       })

@@ -1,7 +1,13 @@
 <template>
   <div>
     <h1>Competitions</h1>
-
+    <v-alert
+      dismissible
+      :value="alert"
+      type="error"
+    >
+      {{ alertText }}
+    </v-alert>
     <div class="filter-container">
 
       <v-row align="center">
@@ -97,6 +103,8 @@ export default {
   },
   data() {
     return {
+      alert: false,
+      alertText: null,
       calculateLoading: false,
       icons : {
         plusIcon: mdiPlus
@@ -158,13 +166,20 @@ export default {
       },
       { 
         headerName: '# Competitors', 
-        field: 'competitors_amount', 
+        field: 'competitors', 
         width: 200,
         minWidth: 100,
         editable: false, 
-        sortable: false, 
+        sortable: true, 
         resizable:true,
         suppressMovable: true,
+        valueFormatter:  function(params) {
+          if (params.value === "" || params.value === undefined || params.value === null || params.value.length == 0) {
+            return '-';
+          } else {
+            return params.value.length;
+          }
+        }
       },
       { 
         headerName: 'Categories',
@@ -172,9 +187,18 @@ export default {
         width: 200,
         minWidth: 80,
         editable: false,
-        sortable: true,
+        sortable: false,
         resizable:true,
-        suppressMovable: true
+        suppressMovable: true,
+        valueFormatter:  function(params) {
+          if (params.value === "" || params.value === undefined || params.value === null || params.value.length == 0) {
+            return '-';
+          } else if (params.value.length > 0) {
+            return params.value.map(e => e.name).join(' / ');
+          } else {
+            return '-';
+          }
+        }
       },
       { 
         headerName: 'Actions', 
@@ -201,8 +225,16 @@ export default {
       getCompetitions().then(response => {
         this.rowData = response.data.items
         this.gridApi.sizeColumnsToFit();
-        this.refreshLoading = false
+        //this.refreshLoading = false
       })
+      .catch(e => {
+        this.alertText = e
+        this.alert = true; 
+        setTimeout(() => this.alert = false, 5000);
+      })
+      .finally(
+        this.refreshLoading = false
+      )
     },
     refreshData() {
       this.getCompetitions()
