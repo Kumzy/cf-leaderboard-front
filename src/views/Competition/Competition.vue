@@ -50,7 +50,7 @@
             class="text-none ml-4"
             style="letter-spacing: normal;"
             color="primary"
-            @click="addCompetitor"
+            @click="addScore"
           >
             <v-icon
               left
@@ -58,21 +58,21 @@
             >
               {{ addAccountIcon }}
             </v-icon>
-            Add
+            Add score
           </v-btn> 
+          <ModalCreateScore ref="createScoreModal"></ModalCreateScore>
            
         </v-col>
       </v-row>
 
     <ag-grid-vue
-      id="competitorsGrid"
+      id="competitionGrid"
       style="width: 100%;"
       class="ag-theme-material"
       :columnDefs="columnDefs"
       :domLayout="domLayout"
       :rowData="rowData"
       :gridOptions="gridOptions">
-      <!-- :frameworkComponents="frameworkComponents"> -->
       </ag-grid-vue>
     </div>
   </div>
@@ -83,14 +83,15 @@
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-material.css";
 import { AgGridVue } from 'ag-grid-vue';
-// import { getAge } from '@/utils/date.js';
 import { mdiMagnify, mdiRefresh, mdiAccountPlus, mdiGenderFemale  } from '@mdi/js';
 import { getCompetition } from '@/api/competition';
+import ModalCreateScore from '@/components/score/ModalCreateScore.vue'
 
 export default {
   name: 'competition',
   components: {
-    AgGridVue
+    AgGridVue,
+    ModalCreateScore
   },
   data() {
     return {
@@ -275,8 +276,14 @@ export default {
     searchGrid() {
       this.gridApi.setQuickFilter(this.search);
     },
-    addCompetitor() {
-      this.$router.push({ name: 'competitor_add' })
+    addScore() {
+      this.$refs.createScoreModal
+        .open(this.data)
+        .then((resolve) => {
+          if (resolve && resolve === true) {
+            this.refreshData();
+          }
+        })
     }
   }
 };
