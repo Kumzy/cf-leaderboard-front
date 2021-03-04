@@ -11,7 +11,7 @@
           cols="12"
           sm="3"
         >
-          <v-text-field
+          <!-- <v-text-field
             v-model="search"
             label="Search for a competitor"
             solo
@@ -20,7 +20,7 @@
             clearable
             @input="searchGrid"
           >
-          </v-text-field>
+          </v-text-field> -->
           
         </v-col>
 
