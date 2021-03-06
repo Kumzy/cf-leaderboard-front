@@ -61,26 +61,22 @@
                 <div style='font-size: 16px;'><v-icon>{{ icons.firework }}</v-icon> Category</div>
               </template>
               <v-radio
-                label="RX"
-                color="red"
-                value="red"
+                v-for="category in competition.categories"
+                :key="category.id"
+                :label="category.name"
+                :value="category"
               ></v-radio>
-              <v-radio
-                label="Scaled"
-                color="orange"
-                value="red darken-3"
-              ></v-radio>    
           </v-radio-group>
 
           <!-- Score -->
           <v-text-field
-            v-model.number="data.score"
+            v-model.number="data.result"
             :prepend-icon="icons.scoreboard"
             outlined
             dense
-            label="Score"
+            label="Result"
             required
-            :rules="rules.scoreRequired"
+            :rules="rules.resultRequired"
           ></v-text-field>
         </v-form>
         </v-card-text>
@@ -98,11 +94,11 @@
 <script>
 import Vue from "vue";
 import { mdiClose, mdiDumbbell, mdiAccount, mdiScoreboard, mdiFirework  } from '@mdi/js';
-// import { postCompetition } from '@/api/competition';
+import { postScore } from '@/api/score';
 // import { getCompetitors } from '@/api/competitor';
 
 export default Vue.extend({
-    name: 'ModalCreateScore',
+    name: 'ModalCreateResult',
     data () {
       return {
         icons:{
@@ -120,15 +116,15 @@ export default Vue.extend({
         data: {
           event: null,
           competitor: null,
-          score: null,
+          result: null,
           category: null
         },
         rules:{
           selectEventRequired: [v => !!v || 'Event is required'],
           selectCompetitorRequired: [v => !!v || 'Competitor is required'],
           categoryRequired: [v => !!v || 'You must select a category'],
-          scoreRequired: [
-            v => !!v || 'Score is required',
+          resultRequired: [
+            v => !!v || 'Result is required',
             v => Number.isInteger(Number(v)) || 'You must enter a number'
             ],
         }
@@ -145,7 +141,7 @@ export default Vue.extend({
         // Resetting data  
         this.data.event = null;
         this.data.competitor = null;
-        this.data.score = null;
+        this.data.result = null;
         this.data.category = null;
 
         return new Promise((resolve, reject) => {
@@ -165,9 +161,18 @@ export default Vue.extend({
         // Checking if the form is validated
         if ( validated === true ) {
           this.creationLoading = true
+          console.log(this.data)
+          postScore(this.data)
+          .then(response => {
+            console.log(response);
+            this.resolve(true)
+            this.dialog = false
+          })
+          .finally(
+            this.creationLoading = false
+          )
           // Form validated, sending request
           // TODO: send request
-          console.log(this.data);
         }
         
         // this.creationLoading = true

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Competition {{ this.data.name }}</h1>
+    <h1>{{ this.data.name }} - Competitors list</h1>
 
     <div class="filter-container">
 
@@ -50,7 +50,7 @@
             class="text-none ml-4"
             style="letter-spacing: normal;"
             color="primary"
-            @click="addResult"
+            @click="addCompetitor"
           >
             <v-icon
               left
@@ -58,9 +58,9 @@
             >
               {{ addAccountIcon }}
             </v-icon>
-            Add result
+            Add Competitor
           </v-btn> 
-          <ModalCreateResult ref="createResultModal"></ModalCreateResult>
+          <ModalAddCompetitorToCompetition ref="addCompetitorToCompetitionModal"></ModalAddCompetitorToCompetition>
            
         </v-col>
       </v-row>
@@ -84,14 +84,15 @@ import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-material.css";
 import { AgGridVue } from 'ag-grid-vue';
 import { mdiMagnify, mdiRefresh, mdiAccountPlus, mdiGenderFemale  } from '@mdi/js';
+import btnCellRendererCompetitionCompetitors from '@/renderers/BtnCellRendererCompetitionCompetitors.vue';
 import { getCompetition } from '@/api/competition';
-import ModalCreateResult from '@/components/score/ModalCreateResult.vue'
+import ModalAddCompetitorToCompetition from '@/components/competition/ModalAddCompetitorToCompetition.vue'
 
 export default {
-  name: 'competition',
+  name: 'competition_competitors',
   components: {
     AgGridVue,
-    ModalCreateResult
+    ModalAddCompetitorToCompetition
   },
   data() {
     return {
@@ -111,6 +112,9 @@ export default {
         suppressRowTransform: true,     
         suppressCellSelection: true,
         overlayNoRowsTemplate: 'No competitors found',
+        components: {
+          countryCellRenderer: countryCellRenderer,
+        }
       },
       data: {},
       competition_id: null,
@@ -136,25 +140,36 @@ export default {
 
     this.columnDefs = [
       { 
-        headerName: 'Rank', 
-        field: 'rank', 
-        width: 200,
+        headerName: 'Firstname', 
+        field: 'firstname', 
+        width: 400,
         minWidth: 100,
         editable: false, 
         sortable: true, 
-        resizable: true,
-        suppressMovable: true ,
-        headerTooltip: 'Determined by total points. The athlete with the fewest points wins.'
+        resizable:true,
+        suppressMovable: true 
       },
       { 
-        headerName: 'Name', 
-        field: 'name', 
+        headerName: 'Lastname', 
+        field: 'lastname', 
         width: 400,
+        minWidth: 100,
+        editable: false, 
+        sortable: true, 
+        resizable:true,
+        suppressMovable: true 
+      },
+      { 
+        headerName: 'Nationality', 
+        field: 'nationality', 
+        width: 200,
         minWidth: 100,
         editable: false, 
         sortable: false, 
         resizable:true,
-        suppressMovable: true 
+        suppressMovable: true,
+        valueGetter: 'data.nationality.name',
+        cellRenderer: 'countryCellRenderer'
       },
       { 
         headerName: 'Age',
@@ -162,8 +177,8 @@ export default {
         width: 100,
         minWidth: 80,
         editable: false,
-        sortable: false,
-        resizable: true,
+        sortable: true,
+        resizable:true,
         suppressMovable: true,
         valueFormatter:  function(params) {
           // TODO: Move in a function
@@ -188,30 +203,44 @@ export default {
         resizable:true,
         suppressMovable: true,
         valueGetter: 'data.gender.name',
-        cellRenderer: function() {
-          const propsObj = {
-            props: {
-              overlap: true,
-              left: true,
-              color: 'success',
-            },
-          };
-          const icon = document.createElement('v-icon', { props: { color: 'success', large: true } }, mdiGenderFemale);
-          const span = document.createElement('span', { slot: 'badge' }, '5');
-          return document.createElement('v-badge', propsObj, [span, icon]);
+      },
+      { 
+        headerName: 'Height', 
+        field: 'height', 
+        width: 200,
+        minWidth: 100,
+        editable: false, 
+        sortable: true, 
+        resizable:true,
+        suppressMovable: true,
+        valueFormatter:  function(params) {
+          return params.value + ' cm';
         }
       },
       { 
-        headerName: 'Points', 
-        field: 'points', 
+        headerName: 'Weight', 
+        field: 'weight', 
         width: 200,
         minWidth: 100,
+        editable: false, 
+        sortable: true, 
+        resizable:true,
+        suppressMovable: true,
+        valueFormatter:  function(params) {
+          return params.value + ' kg';
+        }
+      },
+      { 
+        headerName: 'Profile', 
+        field: 'profile', 
+        width: 200,
+        minWidth: 170,
         editable: false, 
         sortable: false, 
         resizable:true,
         suppressMovable: true,
-        headerTooltip: 'The sum of an athlete\'s workout rankings. Based on a points-per-place ranking system.'
-      },
+        cellRendererFramework: btnCellRendererCompetitionCompetitors,
+      }
     ];
     this.rowData = [
     ];
@@ -224,23 +253,7 @@ export default {
     getCompetition(id) {
       this.refreshLoading = true;
       getCompetition(id).then(response => {
-        
         this.data = response.data.item;
-        if (this.data.events.length > 0 ) {
-          for(var i = 0; i < this.data.events.length; i++) {
-            this.columnDefs.push({
-              field: this.data.events[i].id,
-              headerName: this.data.events[i].name,
-              width: 200,
-              minWidth: 170,
-              editable: false,
-              sortable: true,
-              resizable:true,
-              suppressMovable: true
-            });
-          }
-          this.gridOptions.api.setColumnDefs(this.columnDefs);
-        }
         this.rowData = this.data.competitors
         this.gridApi.sizeColumnsToFit();
         this.refreshLoading = false
@@ -255,8 +268,8 @@ export default {
     searchGrid() {
       this.gridApi.setQuickFilter(this.search);
     },
-    addResult() {
-      this.$refs.createResultModal
+    addCompetitor() {
+      this.$refs.addCompetitorToCompetitionModal
         .open(this.data)
         .then((resolve) => {
           if (resolve && resolve === true) {
@@ -267,15 +280,16 @@ export default {
   }
 };
 
-// function genderCellRenderer(params) {
-//   if (params.value === "" || params.value === undefined || params.value === null || params.data.gender === null) {
-//       return '';
-//   } else {
-//       var icon = `<v-icon>{{ mdiGenderFemale }}</v-icon>` // <img class="flag" border="0" width="15" height="10" src="https://flags.fmcdn.net/data/flags/mini/' + {{ mdiGenderFemale }}`;
-//       return icon + ' ' + params.value;
-//   }
-// }
-
+function countryCellRenderer(params) {
+  // TODO: Maybe try to use cellRendererParams in coldef to pass directly the iso code instead of retrieveing it from row data
+  // get flags from here: http://www.freeflagicons.com/
+  if (params.value === "" || params.value === undefined || params.value === null || params.data.nationality === null || params.data.nationality.iso2 === null) {
+      return '';
+  } else {
+      var flag = '<img class="flag" border="0" width="15" height="10" src="https://flags.fmcdn.net/data/flags/mini/' + params.data.nationality.iso2 + '.png">';
+      return flag + ' ' + params.value;
+  }
+}
 </script>
 
 <style lang="scss">  
