@@ -8,6 +8,14 @@ export function getCompetitions(query) {
   })
 }
 
+export function getCompetitionLeaderboard(id,query) {
+  return request({
+    url: `/api/competition/${id}/leaderboard`,
+    method: 'get',
+    params: query
+  })
+}
+
 export function postCompetition(data) {
   return request({
     url: '/api/competition',

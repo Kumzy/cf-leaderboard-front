@@ -16,7 +16,8 @@
         <v-divider></v-divider>
         <p></p>
         <v-card-text>
-
+          
+          <div class="my-4 subtitle-1">Only competitors not added to the compeitition can be selected.</div>
           <!-- Competitor -->
           <v-autocomplete
             v-model="data.competitor"
@@ -62,20 +63,14 @@ export default Vue.extend({
         creationLoading : false,
         dialog: false,
         menu: null,
-        competitors_available: null,
+        competitors_available: [],
         competition: {},
         data: {
           compititon: null,
           competitor: null,
         },
         rules:{
-          selectEventRequired: [v => !!v || 'Event is required'],
           selectCompetitorRequired: [v => !!v || 'Competitor is required'],
-          categoryRequired: [v => !!v || 'You must select a category'],
-          resultRequired: [
-            v => !!v || 'Result is required',
-            v => Number.isInteger(Number(v)) || 'You must enter a number'
-            ],
         }
       }
     },
@@ -92,9 +87,9 @@ export default Vue.extend({
         this.data.competition = null;
         this.data.competitor = null;
 
-        getCompetitors()
+        getCompetitors({'exclude_competitors_in_competition_id': this.competition.id })
         .then(response => {
-          console.log(response);
+          this.competitors_available = response.data.items
         })
 
         return new Promise((resolve, reject) => {
