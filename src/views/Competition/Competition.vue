@@ -44,7 +44,7 @@
                 src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
               >
                 <v-card-title>
-                  {{ this.data.competitors.length }} competitors
+                  {{ this.competitors_amount }} competitors
                   <v-spacer></v-spacer>
                   <v-btn
                     color="primary"
@@ -71,7 +71,7 @@
                 src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
               >
                 <v-card-title>
-                  {{ this.data.events.length }} events
+                  {{ this.events_amount }} events - {{ this.categories }}
                   <v-spacer></v-spacer>
                   <v-btn
                     color="primary"
@@ -102,6 +102,9 @@ export default {
     return {
       data: {},
       competition_id: null,
+      categories: null,
+      events_amount: 0,
+      competitors_amount: 0,
     };
   },
   created() {
@@ -115,6 +118,9 @@ export default {
       this.refreshLoading = true;
       getCompetition(id).then(response => {
         this.data = response.data.item;
+        this.categories = this.data.categories.map(e => e.name).join(' / ')
+        this.competitors_amount = this.data.competitors.length
+        this.events_amount = this.data.events.length
         this.refreshLoading = false
       })
     },
