@@ -1,91 +1,79 @@
 <template>
-  <div>
+  <v-container>
     <h1>Competitions</h1>
-     <v-container>
-      <v-alert
-        dismissible
-        :value="alert"
-        type="error"
+
+    <v-alert
+      dismissible
+      :value="alert"
+      type="error"
+    >
+      {{ alertText }}
+    </v-alert>
+
+    <v-row align="center">
+      <!-- Left group -->
+      <v-col 
+        class="d-flex"
+        cols="12"
+        sm="3"
       >
-        {{ alertText }}
-      </v-alert>
-    
+        
+        
+      </v-col>
 
-      <v-row align="center">
-        <!-- Left group -->
-        <v-col 
-          class="d-flex"
-          cols="12"
-          sm="3"
+      <!-- Right group -->
+      <v-col class="text-right">
+
+        <!-- Button refresh -->
+        <v-btn
+          :loading="refreshLoading"
+          :disabled="refreshLoading"
+          color="blue-grey"
+          class="text-none ml-4 white--text"
+          style="letter-spacing: normal;"
+          @click="refreshData"
         >
-          <!-- <v-text-field
-            v-model="search"
-            label="Search for a competitor"
-            solo
-            dense
-            :prepend-inner-icon="searchIcon"
-            clearable
-            @input="searchGrid"
+          <v-icon
+            left
+            dark
           >
-          </v-text-field> -->
-          
-        </v-col>
+            {{ icons.refresh }}
+          </v-icon>
+          Refresh
+        </v-btn>
 
-        <!-- Right group -->
-        <v-col class="text-right">
-
-          <!-- Button refresh -->
-          <v-btn
-            :loading="refreshLoading"
-            :disabled="refreshLoading"
-            color="blue-grey"
-            class="text-none ml-4 white--text"
-            style="letter-spacing: normal;"
-            @click="refreshData"
+        <!-- Button add -->
+        <v-btn
+          v-if="logged"
+          class="text-none ml-4"
+          style="letter-spacing: normal;"
+          color="primary"
+          @click="addCompetition"
+        >
+          <v-icon
+            left
+            dark
           >
-            <v-icon
-              left
-              dark
-            >
-              {{ refreshIcon }}
-            </v-icon>
-            Refresh
-          </v-btn>
+            {{ icons.plus }}
+          </v-icon>
+          Create competition
+        </v-btn> 
+        <ModalCreateCompetition ref="createModal"></ModalCreateCompetition>
+      </v-col>
+    </v-row>
 
-          <!-- Button add -->
-          <v-btn
-            v-if="logged"
-            class="text-none ml-4"
-            style="letter-spacing: normal;"
-            color="primary"
-            @click="addCompetition"
-          >
-            <v-icon
-              left
-              dark
-            >
-              {{ icons.plusIcon }}
-            </v-icon>
-            Create competition
-          </v-btn> 
-          <ModalCreateCompetition ref="createModal"></ModalCreateCompetition>
-        </v-col>
-      </v-row>
-
-    <ag-grid-vue
-      id="competitionsGrid"
-      style="width: 100%;"
-      class="ag-theme-material mt-10"
-      :columnDefs="columnDefs"
-      :domLayout="domLayout"
-      :rowData="rowData"
-      :gridOptions="gridOptions">
-      <!-- :frameworkComponents="frameworkComponents"> -->
-      </ag-grid-vue>
-    
-    </v-container>
-  </div>
-
+  <ag-grid-vue
+    id="competitionsGrid"
+    style="width: 100%;"
+    class="ag-theme-material mt-10"
+    :columnDefs="columnDefs"
+    :domLayout="domLayout"
+    :rowData="rowData"
+    :gridOptions="gridOptions">
+    <!-- :frameworkComponents="frameworkComponents"> -->
+    </ag-grid-vue>
+  
+  </v-container>
 </template>
 
 <script>
@@ -94,8 +82,7 @@ import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-material.css";
 import { AgGridVue } from 'ag-grid-vue';
 import btnCompetitionCellRenderer from '@/renderers/BtnCompetitionCellRenderer.vue';
-// import { getAge } from '@/utils/date.js';
-import { mdiMagnify, mdiRefresh, mdiPlus  } from '@mdi/js';
+import { mdiRefresh, mdiPlus  } from '@mdi/js';
 import { getCompetitions } from '@/api/competition';
 import ModalCreateCompetition from '@/components/competition/ModalCreateCompetition.vue'
 
@@ -111,16 +98,12 @@ export default {
       alertText: null,
       calculateLoading: false,
       icons : {
-        plusIcon: mdiPlus
+        plus: mdiPlus,
+        refresh: mdiRefresh
       },
-      searchIcon: mdiMagnify,
-      refreshIcon: mdiRefresh,
       refreshLoading: false,
-      align:'start',
-      justify:'start',
       columnDefs: null,
       rowData: null,
-      search: null,
       gridApi: null,
       gridOptions: {
         suppressRowTransform: true,     
@@ -130,8 +113,7 @@ export default {
           countryCellRenderer: countryCellRenderer,
         }
       },
-      logged: false,
-      genders:['All','Male','Female']
+      logged: false
     };
   },
   created() {
