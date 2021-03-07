@@ -1,85 +1,84 @@
 <template>
-  <div>
+  <v-container fluid>
     <h1>{{ this.data.name }} - Competitors list</h1>
-
-    <div class="filter-container">
-
-      <v-row align="center">
-        <!-- Left group -->
-        <v-col 
-          class="d-flex"
-          cols="12"
-          sm="3"
+    <v-row align="center">
+      <!-- Left group -->
+      <v-col 
+        class="d-flex"
+        cols="12"
+        sm="3"
+      >
+        <v-text-field
+          v-model="search"
+          label="Search for a competitor"
+          dense
+          outlined
+          :prepend-inner-icon="searchIcon"
+          clearable
+          @input="searchGrid"
         >
-          <v-text-field
-            v-model="search"
-            label="Search for a competitor"
-            solo
-            dense
-            :prepend-inner-icon="searchIcon"
-            clearable
-            @input="searchGrid"
+        </v-text-field>
+        
+      </v-col>
+
+      <!-- Right group -->
+      <v-col class="text-right">
+
+        <!-- Button refresh
+        <v-btn
+          :loading="refreshLoading"
+          :disabled="refreshLoading"
+          color="blue-grey"
+          class="text-none ml-4 white--text"
+          style="letter-spacing: normal;"
+          @click="refreshData"
+        >
+          <v-icon
+            left
+            dark
           >
-          </v-text-field>
+            {{ refreshIcon }}
+          </v-icon>
+          Refresh
+        </v-btn> -->
+
+        <!-- Button add -->
+        <v-btn
+          v-if="logged"
+          class="text-none ml-4"
+          style="letter-spacing: normal;"
+          color="primary"
+          @click="addCompetitor"
+        >
+          <v-icon
+            left
+            dark
+          >
+            {{ addAccountIcon }}
+          </v-icon>
+          Add Competitor
+        </v-btn> 
+        <ModalAddCompetitorToCompetition ref="addCompetitorToCompetitionModal"></ModalAddCompetitorToCompetition>
           
-        </v-col>
-
-        <!-- Right group -->
-        <v-col class="text-right">
-
-          <!-- Button refresh -->
-          <v-btn
-            :loading="refreshLoading"
-            :disabled="refreshLoading"
-            color="blue-grey"
-            class="text-none ml-4 white--text"
-            style="letter-spacing: normal;"
-            @click="refreshData"
-          >
-            <v-icon
-              left
-              dark
-            >
-              {{ refreshIcon }}
-            </v-icon>
-            Refresh
-          </v-btn>
-
-          <!-- Button add -->
-          <v-btn
-            class="text-none ml-4"
-            style="letter-spacing: normal;"
-            color="primary"
-            @click="addCompetitor"
-          >
-            <v-icon
-              left
-              dark
-            >
-              {{ addAccountIcon }}
-            </v-icon>
-            Add Competitor
-          </v-btn> 
-          <ModalAddCompetitorToCompetition ref="addCompetitorToCompetitionModal"></ModalAddCompetitorToCompetition>
-           
-        </v-col>
-      </v-row>
+      </v-col>
+    </v-row>
 
     <ag-grid-vue
       id="competitionGrid"
       style="width: 100%;"
-      class="ag-theme-material"
+      class="ag-theme-material mt-5"
       :columnDefs="columnDefs"
       :domLayout="domLayout"
       :rowData="rowData"
       :gridOptions="gridOptions">
       </ag-grid-vue>
-    </div>
-  </div>
+
+  </v-container>
 
 </template>
 
 <script>
+import { getToken } from '@/utils/auth';
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-material.css";
 import { AgGridVue } from 'ag-grid-vue';
@@ -118,10 +117,15 @@ export default {
       },
       data: {},
       competition_id: null,
-      genders: []
+      genders: [],
+      logged: false,
     };
   },
   created() {
+    const hasToken = getToken()
+    if (hasToken) {
+      this.logged = true;
+    }
     // Link resize of window to the ag-grid
     window.addEventListener("resize", this.windowResized);
     this.competition_id = this.$route.params.id;
@@ -240,6 +244,7 @@ export default {
         resizable:true,
         suppressMovable: true,
         cellRendererFramework: btnCellRendererCompetitionCompetitors,
+        cellRendererParams: {logged: this.logged},
       }
     ];
     this.rowData = [

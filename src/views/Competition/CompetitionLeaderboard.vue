@@ -1,9 +1,6 @@
 <template>
-  <div>
+  <v-container fluid>
     <h1>Competition {{ this.data.name }} - Leaderboard</h1>
-
-    <div class="filter-container">
-
       <v-row align="center">
         <!-- Left group -->
         <v-col 
@@ -85,8 +82,8 @@
       :rowData="rowData"
       :gridOptions="gridOptions">
       </ag-grid-vue>
-    </div>
-  </div>
+   
+  </v-container>
 
 </template>
 
