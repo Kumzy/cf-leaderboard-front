@@ -1,14 +1,15 @@
 <template>
   <div>
     <h1>Competitions</h1>
-    <v-alert
-      dismissible
-      :value="alert"
-      type="error"
-    >
-      {{ alertText }}
-    </v-alert>
-    <div class="filter-container">
+     <v-container>
+      <v-alert
+        dismissible
+        :value="alert"
+        type="error"
+      >
+        {{ alertText }}
+      </v-alert>
+    
 
       <v-row align="center">
         <!-- Left group -->
@@ -74,14 +75,15 @@
     <ag-grid-vue
       id="competitionsGrid"
       style="width: 100%;"
-      class="ag-theme-material"
+      class="ag-theme-material mt-10"
       :columnDefs="columnDefs"
       :domLayout="domLayout"
       :rowData="rowData"
       :gridOptions="gridOptions">
       <!-- :frameworkComponents="frameworkComponents"> -->
       </ag-grid-vue>
-    </div>
+    
+    </v-container>
   </div>
 
 </template>
