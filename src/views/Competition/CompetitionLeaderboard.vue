@@ -55,6 +55,7 @@
 
           <!-- Button add -->
           <v-btn
+            v-if="logged"
             class="text-none ml-4"
             style="letter-spacing: normal;"
             color="primary"
@@ -88,6 +89,7 @@
 </template>
 
 <script>
+import { getToken } from '@/utils/auth';
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-material.css";
 import { AgGridVue } from 'ag-grid-vue';
@@ -124,9 +126,14 @@ export default {
       competition_id: null,
       genders: [],
       gender: null,
+      logged: false
     };
   },
   created() {
+    const hasToken = getToken()
+    if (hasToken) {
+      this.logged = true;
+    }
     // Link resize of window to the ag-grid
     window.addEventListener("resize", this.windowResized);
     this.competition_id = this.$route.params.id;
@@ -224,14 +231,9 @@ export default {
               valueGetter: function(params) {
                 var result = ''
                 if ( params && params.colDef && params.colDef.field && params.data.events.length > 0 ) {
-                  // console.log(params.colDef)
-                  // console.log(params.data.events)
-                 
                   params.data.events.forEach( function( event ){
                     if ( event.event_id === params.colDef.field ) {
-                      // console.log(event)
                       result =  ordinal_suffix_of(event.point) + ' ('+event.result +')';
-                      // return 'yolo';
                     }
                   } );
                 }
@@ -245,6 +247,7 @@ export default {
         this.gridApi.sizeColumnsToFit();
         this.refreshLoading = false
       })
+      
     },
     getCompetitionLeaderboard(gender_id) {
       if (this.competition_id !== null && this.competition_id !== undefined && gender_id !== null && gender_id !== undefined ) {

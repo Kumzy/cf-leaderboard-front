@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <h1>Competition {{ this.data.name }}</h1>
-    <v-row dense justify="center" align="center">
+    <v-row dense justify="center" align="center" class="mt-5">
       <v-col>
     
         <!-- Leaderboard -->
@@ -14,9 +14,7 @@
             height="200px"
             src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
           >
-
             <v-card-title>
-              
               <v-spacer></v-spacer>
               <v-btn
               color="primary"
@@ -76,6 +74,7 @@
                 color="primary"
                 class="text-none"
                 depressed
+                disabled
                 @click="clickEvents"
               >
                 Events
