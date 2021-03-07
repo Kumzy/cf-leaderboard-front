@@ -1,93 +1,93 @@
 <template>
-  <div>
+  <v-container fluid>
     <h1>Competition {{ this.data.name }}</h1>
-      <v-container fill-height fluid>
-        <v-row dense justify="center" align="center">
-          <v-col>
-       
-            <!-- Leaderboard -->
-            <v-card
-              class="mx-auto"
-              max-width="400"
+    <v-container fill-height fluid>
+      <v-row dense justify="center" align="center">
+        <v-col>
+      
+          <!-- Leaderboard -->
+          <v-card
+            class="mx-auto"
+            max-width="400"
+          >
+            <v-img
+              class="white--text align-end"
+              height="200px"
+              src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
             >
-              <v-img
-                class="white--text align-end"
-                height="200px"
-                src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
-              >
 
-                <v-card-title>
-                 
-                  <v-spacer></v-spacer>
-                  <v-btn
+              <v-card-title>
+                
+                <v-spacer></v-spacer>
+                <v-btn
+                color="primary"
+                class="text-none"
+                depressed
+                @click="clickLeaderboard"
+              >
+                Leaderboard
+              </v-btn></v-card-title>
+            </v-img>
+
+          </v-card>
+        </v-col>
+        
+        <!-- Competitors -->
+        <v-col>
+          <v-card
+            class="mx-auto"
+            max-width="400"
+          >
+            <v-img
+              class="white--text align-end"
+              height="200px"
+              src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+            >
+              <v-card-title>
+                {{ this.competitors_amount }} competitors
+                <v-spacer></v-spacer>
+                <v-btn
                   color="primary"
                   class="text-none"
                   depressed
-                  @click="clickLeaderboard"
+                  @click="clickCompetitors"
                 >
-                  Leaderboard
-                </v-btn></v-card-title>
-              </v-img>
+                  Competitors
+                </v-btn>
+              </v-card-title>
+            </v-img>
+          </v-card>
+        </v-col>
 
-            </v-card>
-          </v-col>
-          
-          <!-- Competitors -->
-          <v-col>
-            <v-card
-              class="mx-auto"
-              max-width="400"
+        <!-- Events -->
+        <v-col>
+          <v-card
+            class="mx-auto"
+            max-width="400"
+          >
+            <v-img
+              class="white--text align-end"
+              height="200px"
+              src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
             >
-              <v-img
-                class="white--text align-end"
-                height="200px"
-                src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
-              >
-                <v-card-title>
-                  {{ this.competitors_amount }} competitors
-                  <v-spacer></v-spacer>
-                  <v-btn
-                    color="primary"
-                    class="text-none"
-                    depressed
-                    @click="clickCompetitors"
-                  >
-                    Competitors
-                  </v-btn>
-                </v-card-title>
-              </v-img>
-            </v-card>
-          </v-col>
-
-          <!-- Events -->
-          <v-col>
-            <v-card
-              class="mx-auto"
-              max-width="400"
-            >
-              <v-img
-                class="white--text align-end"
-                height="200px"
-                src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
-              >
-                <v-card-title>
-                  {{ this.events_amount }} events - {{ this.categories }}
-                  <v-spacer></v-spacer>
-                  <v-btn
-                    color="primary"
-                    class="text-none"
-                    depressed
-                    @click="clickEvents"
-                  >
-                    Events
-                  </v-btn>
-                </v-card-title>
-              </v-img>
-            </v-card>
-          </v-col>
-        </v-row>
-      </v-container>
-    </div>
+              <v-card-title>
+                {{ this.events_amount }} events - {{ this.categories }}
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="primary"
+                  class="text-none"
+                  depressed
+                  @click="clickEvents"
+                >
+                  Events
+                </v-btn>
+              </v-card-title>
+            </v-img>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-container>
 </template>
 
 <script>
