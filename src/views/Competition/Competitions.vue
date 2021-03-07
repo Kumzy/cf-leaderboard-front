@@ -53,6 +53,7 @@
 
           <!-- Button add -->
           <v-btn
+            v-if="logged"
             class="text-none ml-4"
             style="letter-spacing: normal;"
             color="primary"
@@ -86,6 +87,7 @@
 </template>
 
 <script>
+import { getToken } from '@/utils/auth'
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-material.css";
 import { AgGridVue } from 'ag-grid-vue';
@@ -126,11 +128,16 @@ export default {
           countryCellRenderer: countryCellRenderer,
         }
       },
+      logged: false,
       genders:['All','Male','Female']
     };
   },
   created() {
     // Link resize of window to the ag-grid
+    const hasToken = getToken()
+    if (hasToken) {
+      this.logged = true;
+    }
     window.addEventListener("resize", this.windowResized);
     this.getCompetitions();
   },

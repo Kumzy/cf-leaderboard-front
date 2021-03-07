@@ -19,6 +19,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   },
   {
+    name: 'login',
+    path: '/login',
+    component: () => import('@/views/Login/Login.vue')
+  },
+  {
     path: '/competitions',
     name: 'competitions',
     component: () => import('@/views/Competition/Competitions.vue')
@@ -58,10 +63,27 @@ const routes = [
   
 ]
 
-const router = new VueRouter({
+const createRouter = () => new VueRouter({
   mode: 'history',
+  //scrollBehavior: () => ({ y: 0 }),
   base: process.env.BASE_URL,
   routes
 })
 
+const router = createRouter()
+
+export function resetRouter () {
+  const newRouter = createRouter()
+  router.matcher = newRouter.matcher
+}
+
 export default router
+
+
+// const router = new VueRouter({
+//   mode: 'history',
+//   base: process.env.BASE_URL,
+//   routes
+// })
+
+// export default router
