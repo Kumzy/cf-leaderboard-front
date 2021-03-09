@@ -4,6 +4,7 @@ import { getToken } from '@/utils/auth'
 
 // create an axios instance
 const service = axios.create({
+  // Replace with actual server IP
   baseURL: 'http://127.0.0.1:5000/', // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
   timeout: 5000 // request timeout
@@ -14,9 +15,10 @@ service.interceptors.request.use(
   config => {
     // do something before request is sent
     // console.log(this.$cookie.get('token'))
+    config.headers['Access-Control-Allow-Origin'] = '*'
     if (store.getters.token) {
       // let each request carry token
-      config.headers['Access-Control-Allow-Origin'] = '*'
+      // config.headers['Access-Control-Allow-Origin'] = '*'
       config.headers['Authorization'] = 'Bearer ' + getToken()
     }
     return config
