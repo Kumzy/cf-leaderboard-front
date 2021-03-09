@@ -99,6 +99,7 @@ export default Vue.extend({
       },
       add() {
         this.creationLoading = true
+        // TODO
         postCompetition(this.data).then(response => {
           console.log(response);
           this.creationLoading = false

@@ -12,6 +12,7 @@
                       <v-form>
                         <v-row justify="center" align="center">
                           <Avataaars
+                            v-if="form.avatar"
                             :width="widthAvatar"
                             :height="heightAvatar"
                             :avatarOptions="form.avatar"
@@ -32,7 +33,7 @@
                         <v-text-field
                           outlined
                           :prepend-icon="accountIcon"
-                          v-model="form.firstName"
+                          v-model="form.firstname"
                           label="Firstname"
                           class="mb-4">
                         </v-text-field>
@@ -41,7 +42,7 @@
                         <v-text-field
                           outlined
                           :prepend-icon="accountIcon"
-                          v-model="form.lastName"
+                          v-model="form.lastname"
                           label="Lastname"
                           class="mb-4">
                         </v-text-field>
@@ -49,15 +50,17 @@
                         <!-- Nationality -->
                         <v-autocomplete
                           outlined
+                          v-model="form.nationality.id"
                           :items="countries"
                           :prepend-icon="nationalityIcon"
                           item-text="name"
-                          item-value="code"
+                          item-value="id"
+                          item-key="id"
                           clearable
                         >
                           <template v-slot:item="data">
                             <v-list-item-avatar tile>
-                              <v-img max-width="20" max-height="15" :src="getCountryFlag(data.item.code)"></v-img>
+                              <v-img max-width="20" max-height="15" :src="getCountryFlag(data.item.iso2)"></v-img>
                             </v-list-item-avatar>
                             <v-list-item-content v-text="data.item.name"></v-list-item-content>
                           </template>
@@ -92,26 +95,24 @@
                           ></v-date-picker>
                         </v-menu>
 
+
                         <!-- Gender -->
                         <v-radio-group
-                          v-model="form.gender.name"
-                          mandatory
-                        >
-                          <template v-slot:label>
-                            <div><v-icon>{{ genderIcon }}</v-icon> Gender</div>
-                          </template>
-                          <v-radio
-                            label="Male"
-                            value="male"
-                          ></v-radio>
-                          <v-radio
-                            label="Female"
-                            value="female"
-                          ></v-radio>
-                          <v-radio
-                            label="Other"
-                            value="other"
-                          ></v-radio>
+                            v-model="form.gender.id"
+                            row
+                            required
+                            :rules="rules.genderRequired"
+                            class="mb-5"
+                          >
+                            <template v-slot:label>
+                              <div style='font-size: 16px;'><v-icon>{{ genderIcon }}</v-icon> Gender</div>
+                            </template>
+                            <v-radio
+                              v-for="gender in genders"
+                              :key="gender.id"
+                              :label="gender.name"
+                              :value="gender.id"
+                            ></v-radio>
                         </v-radio-group>
 
                         <!-- Height -->
@@ -149,6 +150,7 @@
                             depressed
                             color="primary"
                             @click="handleActionButton"
+                            :loading="loading"
                           >
                             <v-icon
                               left
@@ -171,9 +173,11 @@
 <script>
 import { mdiWeight, mdiHumanMaleHeight, mdiCalendar, mdiGenderMaleFemale, mdiEarth, mdiAccount, mdiContentSave, mdiAccountPlus } from '@mdi/js'
 import ModalAvatar from '@/components/avatar/ModalAvatar.vue'
-import { putCompetitor } from '@/api/competitor'
+import { putCompetitor, getCompetitor, postCompetitor } from '@/api/competitor'
+import { getGenders } from '@/api/gender';
+import { getCountries } from '@/api/countries';
 import Avataaars from 'vue-avataaars'
-import countries from '@/data/countries'
+//import countries from '@/data/countries'
 
 export default {
   name: 'competitor',
@@ -184,7 +188,8 @@ export default {
   data() {
     return {
         loading: false,
-        countries: countries,
+        competitor_id: null,
+        countries: [],
         saveIcon: mdiContentSave,
         accountIcon: mdiAccount,
         calendarIcon: mdiCalendar,
@@ -196,26 +201,68 @@ export default {
         menu: null,
         widthAvatar: 200,
         heightAvatar: 200,
+        genders: [],
         form: {
-            firstName: '',
-            lastName: '',
+            firstname: '',
+            lastname: '',
             nationality: {
-              name: ''
+              id: ''
             },
             birthday_date: '',
             gender: {
-              name: ''
+              id: ''
             },
             height: 0,
             weight: 0,
-            avatar: null
+            avatar: null,
         },
+        rules:{
+          selectEventRequired: [v => !!v || 'Event is required'],
+          selectCompetitorRequired: [v => !!v || 'Competitor is required'],
+          genderRequired: [v => !!v || 'You must select a gender'],
+          resultRequired: [
+            v => !!v || 'Result is required',
+            v => Number.isInteger(Number(v)) || 'You must enter a number'
+            ],
+        }
     };
   },
   props: {
     editing: Boolean,
   },
+  created() {
+    this.getGenders();
+    this.getCountries();
+    if (this.$route.params.id) {
+      console.log('editing')
+      this.competitor_id = this.$route.params.id;
+      if (this.competitor_id && this.competitor_id !== undefined && this.competitor_id !== null ) {
+        this.getCompetitor(this.competitor_id);
+      }
+    }
+ 
+  },
   methods: {
+    getCountries() {
+      getCountries().then(response => {
+        this.countries = response.data.items;
+      })
+    },
+    getGenders() {
+      getGenders().then(response => {
+        this.genders = response.data.items;
+      })
+    },
+    getCompetitor(id) {
+      // this.refreshLoading = true;
+      getCompetitor(id).then(response => {
+        this.form = response.data.item;
+        // this.categories = this.data.categories.map(e => e.name).join(' / ')
+        // this.competitors_amount = this.data.competitors.length
+        // this.events_amount = this.data.events.length
+        // this.refreshLoading = false
+      })
+    },
     getCountryFlag(code) {
       return "https://flags.fmcdn.net/data/flags/mini/" + code.toLowerCase()  + ".png";
     },
@@ -239,13 +286,23 @@ export default {
     },
     createCompetitor() {
       // Create a competitor (called by handleActionButton method)
+      this.loading = true;
+      postCompetitor(this.form).then(() => {
+        this.$router.push({name: 'competitors'})
+      })
+      .finally(
+        this.loading = false
+      )
     },
     updateCompetitor() {
       // Update a competitor (called by handleActionButton method)
-      putCompetitor(this.form).then(response => {
-        console.log(response);
+      this.loading = true;
+      putCompetitor(this.form).then(() => {
         this.$router.push({name: 'competitors'})
       })
+      .finally(
+        this.loading = false
+      )
     },
     changeAvatar() {
       // Open a dialog to change the avatar
@@ -254,6 +311,8 @@ export default {
         .then((resolve) => {
           if (resolve == true) {
             this.form.avatar = this.$refs.avatarModal.avatarOptions
+            console.log(this.form.avatar)
+            this.$forceUpdate();
           }
         })
     }

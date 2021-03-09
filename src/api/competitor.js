@@ -16,9 +16,24 @@ export function putCompetitor(data) {
   })
 }
 
+export function postCompetitor(data) {
+  return request({
+    url: '/api/competitor',
+    method: 'post',
+    data
+  })
+}
+
 export function deleteCompetitor(id) {
   return request({
     url: `/api/competitor/${id}`,
     method: 'delete'
+  })
+}
+
+export function getCompetitor(id) {
+  return request({
+    url: `/api/competitor/${id}`,
+    method: 'get'
   })
 }
