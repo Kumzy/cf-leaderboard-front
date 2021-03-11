@@ -49,7 +49,7 @@
 <script>
 import Vue from "vue";
 import { mdiClose, mdiAccount } from '@mdi/js';
-import { postCompetition } from '@/api/competition';
+import { postCompetitorToCompetition } from '@/api/competition';
 import { getCompetitors } from '@/api/competitor';
 
 export default Vue.extend({
@@ -79,14 +79,17 @@ export default Vue.extend({
         // Set competition as property
         this.competition = competition;
 
+        // Reset data
+        this.data.competitor = null;
+        this.data.competition = null;
+
+        this.data.competition = this.competition;
+
         // Showing dialog
         this.dialog = true
         this.creationLoading = false
         
-        // Reset data
-        this.data.competition = null;
-        this.data.competitor = null;
-
+        
         getCompetitors({'exclude_competitors_in_competition_id': this.competition.id })
         .then(response => {
           this.competitors_available = response.data.items
@@ -100,7 +103,7 @@ export default Vue.extend({
       add() {
         this.creationLoading = true
         // TODO
-        postCompetition(this.data).then(response => {
+        postCompetitorToCompetition(this.data).then(response => {
           console.log(response);
           this.creationLoading = false
           this.resolve(true)

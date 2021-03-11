@@ -30,3 +30,11 @@ export function getCompetition(id) {
     method: 'get'
   })
 }
+
+export function postCompetitorToCompetition(data) {
+  return request({
+    url: '/api/competition/competitor/add',
+    method: 'POST',
+    data
+  })
+}
