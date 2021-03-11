@@ -89,12 +89,14 @@
 
 <script>
 import { getCompetition } from '@/api/competition';
+import { getToken } from '@/utils/auth';
 
 export default {
   name: 'competition',
   data() {
     return {
       data: {},
+      logged: false,
       competition_id: null,
       categories: null,
       events_amount: 0,
@@ -102,6 +104,10 @@ export default {
     };
   },
   created() {
+    const hasToken = getToken()
+    if (hasToken) {
+      this.logged = true;
+    }
     this.competition_id = this.$route.params.id;
     if (this.competition_id && this.competition_id !== undefined && this.competition_id !== null ) {
       this.getCompetition(this.competition_id);

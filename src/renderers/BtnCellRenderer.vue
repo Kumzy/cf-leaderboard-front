@@ -12,6 +12,7 @@
 
     <!-- Delete the competitor -->
     <v-btn
+      v-if="this.params.logged"
       class="text-none ml-2"
       style="font-weight: normal; letter-spacing: normal;"
       color="error"

@@ -19,6 +19,7 @@
                           ></Avataaars>
                           
                           <v-btn
+                            v-if="logged"
                             class="text-none"
                             depressed     
                             color="primary"
@@ -146,6 +147,7 @@
                           </v-btn>
                           <v-spacer></v-spacer>
                           <v-btn
+                            v-if="logged"
                             class="text-none"
                             depressed
                             color="primary"
@@ -178,6 +180,7 @@ import { getGenders } from '@/api/gender';
 import { getCountries } from '@/api/countries';
 import Avataaars from 'vue-avataaars'
 //import countries from '@/data/countries'
+import { getToken } from '@/utils/auth';
 
 export default {
   name: 'competitor',
@@ -188,6 +191,7 @@ export default {
   data() {
     return {
         loading: false,
+        logged: false,
         competitor_id: null,
         countries: [],
         saveIcon: mdiContentSave,
@@ -231,6 +235,10 @@ export default {
     editing: Boolean,
   },
   created() {
+    const hasToken = getToken()
+    if (hasToken) {
+      this.logged = true;
+    }
     this.getGenders();
     this.getCountries();
     if (this.$route.params.id) {

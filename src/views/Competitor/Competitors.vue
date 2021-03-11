@@ -47,6 +47,7 @@
 
           <!-- Button add -->
           <v-btn
+            v-if="logged"
             class="text-none ml-4"
             style="letter-spacing: normal;"
             color="primary"
@@ -87,6 +88,7 @@ import btnCellRenderer from '@/renderers/BtnCellRenderer.vue';
 // import { getAge } from '@/utils/date.js';
 import { mdiMagnify, mdiRefresh, mdiAccountPlus } from '@mdi/js';
 import { getCompetitors } from '@/api/competitor';
+import { getToken } from '@/utils/auth';
 
 export default {
   name: 'competitors',
@@ -96,6 +98,7 @@ export default {
   data() {
     return {
       calculateLoading: false,
+      logged: false,
       addAccountIcon: mdiAccountPlus,
       searchIcon: mdiMagnify,
       refreshIcon: mdiRefresh,
@@ -125,6 +128,10 @@ export default {
     };
   },
   created() {
+    const hasToken = getToken()
+    if (hasToken) {
+      this.logged = true;
+    }
     // Link resize of window to the ag-grid
     window.addEventListener("resize", this.windowResized);
     this.getCompetitors();
@@ -240,6 +247,7 @@ export default {
         resizable:true,
         suppressMovable: true,
         cellRendererFramework: btnCellRenderer,
+        cellRendererParams: {logged: this.logged},
       }
     ];
     this.rowData = [
