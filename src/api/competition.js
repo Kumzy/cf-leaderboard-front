@@ -38,3 +38,13 @@ export function postCompetitorToCompetition(data) {
     data
   })
 }
+
+export function removeCompetitorFromCompetition(query) {
+  return request({
+    url: '/api/competition/competitor',
+    method: 'DELETE',
+    params: query
+  })
+}
+
+

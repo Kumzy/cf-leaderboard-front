@@ -53,7 +53,7 @@ import { postCompetitorToCompetition } from '@/api/competition';
 import { getCompetitors } from '@/api/competitor';
 
 export default Vue.extend({
-    name: 'ModalRemoveCompetitorFromCompetitionResult',
+    name: 'ModalAddCompetitorFromCompetition',
     data () {
       return {
         icons: {
@@ -103,8 +103,8 @@ export default Vue.extend({
       add() {
         this.creationLoading = true
         // TODO
-        postCompetitorToCompetition(this.data).then(response => {
-          console.log(response);
+        postCompetitorToCompetition(this.data).then(() => {
+          // console.log(response);
           this.creationLoading = false
           this.resolve(true)
           this.dialog = false

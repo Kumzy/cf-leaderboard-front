@@ -17,22 +17,22 @@
       style="font-weight: normal; letter-spacing: normal;"
       color="error"
       small
-      @click="btnDeleteClickedHandler()">
+      @click="btnRemoveClickedHandler()">
       Remove
     </v-btn>
-    <modal-delete-competitor ref="deleteModal"></modal-delete-competitor>
+    <modal-remove-competitor-from-competition ref="removeCompetitorModal"></modal-remove-competitor-from-competition>
   </div>
 </template>
 
 <script>
 import Vue from "vue";
-import ModalDeleteCompetitor from '@/components/ModalDeleteCompetitor.vue'
-import { deleteCompetitor } from '@/api/competitor'
+import ModalRemoveCompetitorFromCompetition from '@/components/competition/ModalRemoveCompetitorFromCompetition.vue'
+import { removeCompetitorFromCompetition } from '@/api/competition'
 
 export default Vue.extend({
   name: 'BtnCellRendererCompetitionCompetitors',
   components: {
-    ModalDeleteCompetitor,
+    ModalRemoveCompetitorFromCompetition,
   },
   methods: {
     btnViewClickedHandler() {
@@ -41,13 +41,15 @@ export default Vue.extend({
         this.$router.push({ name: 'competitor', params: { id: this.params.data.id } });
       }
     },
-    btnDeleteClickedHandler() {
-      this.$refs.deleteModal
-        .open(this.params.data.firstname, this.params.data.lastname)
+    btnRemoveClickedHandler() {
+      var competition_id = this.$route.params.id;
+      this.$refs.removeCompetitorModal
+        .open(this.params.data,competition_id)
         .then((resolve) => {
           if ( resolve && this.params.data && this.params.data.id && resolve == true) {
-            deleteCompetitor(this.params.data.id).then(response => {
-              console.log(response);
+            removeCompetitorFromCompetition({ 'competitor_id': this.params.data.id, 'competition_id': competition_id }).then(() => {
+              // console.log(response);
+              this.$router.go(this.$router.currentRoute)
             })
           }
         })

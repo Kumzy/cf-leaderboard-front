@@ -265,7 +265,7 @@ export default {
       })
     },
     refreshData() {
-      // this.getCompetitors()
+      this.getCompetition(this.competition_id);
     },
     generate() {
      
