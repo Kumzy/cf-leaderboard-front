@@ -234,7 +234,7 @@ export default {
     this.getGenders();
     this.getCountries();
     if (this.$route.params.id) {
-      console.log('editing')
+      // console.log('editing')
       this.competitor_id = this.$route.params.id;
       if (this.competitor_id && this.competitor_id !== undefined && this.competitor_id !== null ) {
         this.getCompetitor(this.competitor_id);

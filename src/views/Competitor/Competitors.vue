@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-container fluid>
     <h1>Competitors</h1>
 
     <div class="filter-container">
@@ -14,8 +14,8 @@
           <v-text-field
             v-model="search"
             label="Search for a competitor"
-            solo
             dense
+            outlined
             :prepend-inner-icon="searchIcon"
             clearable
             @input="searchGrid"
@@ -75,7 +75,7 @@
       <!-- :frameworkComponents="frameworkComponents"> -->
       </ag-grid-vue>
     </div>
-  </div>
+  </v-container>
 
 </template>
 
