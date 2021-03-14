@@ -126,7 +126,7 @@
 <script>
 import Vue from "vue";
 import { mdiClose, mdiDumbbell, mdiAccount, mdiScoreboard, mdiFirework, mdiTimer, mdiTimelapse } from '@mdi/js';
-// import { postScore } from '@/api/score';
+import { postScore } from '@/api/score';
 // import { getCompetitors } from '@/api/competitor';
 
 export default Vue.extend({
@@ -212,19 +212,19 @@ export default Vue.extend({
         var validated = this.$refs.scoreForm.validate();
         // Checking if the form is validated
         if ( validated === true ) {
-          // this.creationLoading = true
+          this.creationLoading = true
           this.data.tiebreak = this.convertTimeToInteger(this.tmp_data.tiebreak)
           this.data.time = this.convertTimeToInteger(this.tmp_data.time)
           console.log(this.data)
-          // postScore(this.data)
-          // .then(response => {
-          //   console.log(response);
-          //   this.resolve(true)
-          //   this.dialog = false
-          // })
-          // .finally(
-          //   this.creationLoading = false
-          // )
+          postScore(this.data)
+          .then(() => {
+            // console.log(response);
+            this.resolve(true)
+            this.dialog = false
+          })
+          .finally(
+            this.creationLoading = false
+          )
           // Form validated, sending request
           // TODO: send request
         }
