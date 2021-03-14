@@ -3,7 +3,7 @@
     <v-dialog v-model="dialog" persistent max-width="740" @keydown.esc="dialog = false">
       <v-card align="left">
         
-        <v-card-title class="headline">Enter score
+        <v-card-title class="headline">{{ this.editing ? 'Edit Score' : 'Enter score' }}
         <v-spacer></v-spacer>
         <v-btn
           icon
@@ -79,12 +79,6 @@
             :rules="rules.resultRequired"
           ></v-text-field>
 
-          <!-- Time
-          <input type="text" v-mask="'####-##'" v-model="myInputModel">
-          <v-text-field
-            v-model="data.time"
-            v-mask="'(###) ###-####'"
-          ></v-text-field> -->
           <!-- Time -->
           <v-text-field
             v-model="tmp_data.time"
@@ -116,7 +110,7 @@
         <v-card-actions >
           <v-spacer></v-spacer>
           <v-btn class="text-none" depressed outlined color="grey" @click="cancel()">Cancel</v-btn>
-          <v-btn class="text-none" :loading="creationLoading" depressed dark color="primary" @click="create()">Create</v-btn>
+          <v-btn class="text-none" :loading="creationLoading" depressed dark color="primary" @click="handleAction()">{{ this.editing ? 'Edit' : 'Create' }}</v-btn>
         </v-card-actions >
       </v-card>
     </v-dialog>
@@ -126,13 +120,15 @@
 <script>
 import Vue from "vue";
 import { mdiClose, mdiDumbbell, mdiAccount, mdiScoreboard, mdiFirework, mdiTimer, mdiTimelapse } from '@mdi/js';
-import { postScore } from '@/api/score';
+import { postScore, putScore } from '@/api/score';
+import { getCompetition } from '@/api/competition';
 // import { getCompetitors } from '@/api/competitor';
 
 export default Vue.extend({
     name: 'ModalCreateResult',
     data () {
       return {
+        editing: false,
         icons:{
           close: mdiClose,
           dumbbell: mdiDumbbell,
@@ -147,6 +143,7 @@ export default Vue.extend({
         dialog: false,
         menu: null,
         competition: {},
+        competition_id: null,
         competitors: [],
         tmp_data :{ 
           // used to store time before sending it to the api in integer
@@ -195,19 +192,48 @@ export default Vue.extend({
         this.tmp_data.tiebreak = null;
         this.data.time = null;
         this.data.tiebreak = null;
+        
+        this.editing = false;
 
         return new Promise((resolve, reject) => {
           this.resolve = resolve
           this.reject = reject
         })
       },
-      // getCompetitors() {
-      //   // this.refreshLoading = true;
-      //   getCompetitors().then(response => {
-      //     this.competitors = response.data.items
-      //     // this.refreshLoading = false
-      //   })
-      // },
+      openEdit(competitionId, scoreData) {
+        // Assigning the data
+        this.competition_id = competitionId
+
+        // Showing the dialog
+        this.dialog = true
+        this.creationLoading = false
+
+        // Resetting data  
+        this.data.event = scoreData.event;
+        this.data.competitor = scoreData.competitor;
+        this.data.result = scoreData.result;
+        this.data.category = scoreData.category;
+        this.data.time = scoreData.time;
+        this.data.tiebreak = scoreData.tiebreak;
+        this.data.id = scoreData.id;
+
+        // Resetting data  
+        // this.data = scoreData;
+        this.tmp_data.time = this.convertIntegerToTime(this.data.time);
+        this.tmp_data.tiebreak = this.convertIntegerToTime(this.data.tiebreak);
+                
+        this.editing = true;
+
+        getCompetition(competitionId).then(response => {
+          this.competition = response.data.item;
+          this.$forceUpdate();
+        })
+
+        return new Promise((resolve, reject) => {
+          this.resolve = resolve
+          this.reject = reject
+        })
+      },
       create() {
         var validated = this.$refs.scoreForm.validate();
         // Checking if the form is validated
@@ -215,27 +241,43 @@ export default Vue.extend({
           this.creationLoading = true
           this.data.tiebreak = this.convertTimeToInteger(this.tmp_data.tiebreak)
           this.data.time = this.convertTimeToInteger(this.tmp_data.time)
-          console.log(this.data)
+          // console.log(this.data)
           postScore(this.data)
           .then(() => {
-            // console.log(response);
             this.resolve(true)
             this.dialog = false
           })
           .finally(
             this.creationLoading = false
           )
-          // Form validated, sending request
-          // TODO: send request
         }
-        
-        // this.creationLoading = true
-        // postCompetition(this.data).then(response => {
-        //   console.log(response);
-        //   this.creationLoading = false
-        //   this.resolve(true)
-        //   this.dialog = false
-        // })
+      },
+      edit() {
+        var validated = this.$refs.scoreForm.validate();
+        // Checking if the form is validated
+        if ( validated === true ) {
+          this.creationLoading = true
+          this.data.tiebreak = this.convertTimeToInteger(this.tmp_data.tiebreak)
+          this.data.time = this.convertTimeToInteger(this.tmp_data.time)
+          // console.log(this.data)
+          putScore(this.data,this.data.id)
+          .then(() => {
+            this.resolve(true)
+            this.dialog = false
+          })
+          .finally(
+            this.creationLoading = false
+          )
+        }
+      },
+      handleAction() {
+        if (this.editing && this.data ) {
+          if (this.data.id) {
+             this.edit()
+          }
+        } else {
+          this.create()
+        }
       },
       cancel() {
         this.resolve(false)
@@ -257,6 +299,12 @@ export default Vue.extend({
           } 
         }
         return timeInteger;
+      },
+      convertIntegerToTime(integerTime) {
+        const minutes = Math.floor(integerTime / 60);
+        const seconds = integerTime - minutes * 60;
+        const result = minutes.toLocaleString('fr-FR', { minimumIntegerDigits: 2, useGrouping: false }) + ':' + seconds.toLocaleString('fr-FR', { minimumIntegerDigits: 2, useGrouping: false })
+        return result;
       }
     }
 });

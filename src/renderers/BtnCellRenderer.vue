@@ -3,7 +3,6 @@
     <!-- Button to see the profile of the competitor -->
     <v-btn 
       class="text-none"
-      style="font-weight: normal; letter-spacing: normal;"
       color="primary"
       small
       @click="btnViewClickedHandler()">
@@ -14,7 +13,6 @@
     <v-btn
       v-if="this.params.logged"
       class="text-none ml-2"
-      style="font-weight: normal; letter-spacing: normal;"
       color="error"
       small
       @click="btnDeleteClickedHandler()">
@@ -55,3 +53,10 @@ export default Vue.extend({
   }
 });
 </script>
+
+<style lang="scss">  
+  .v-btn__content {
+    font-weight: normal;
+    letter-spacing: normal;
+  }
+</style>
