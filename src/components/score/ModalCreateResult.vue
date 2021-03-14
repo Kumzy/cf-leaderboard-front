@@ -74,9 +74,41 @@
             :prepend-icon="icons.scoreboard"
             outlined
             dense
-            label="Result"
+            label="Result / Reps"
             required
             :rules="rules.resultRequired"
+          ></v-text-field>
+
+          <!-- Time
+          <input type="text" v-mask="'####-##'" v-model="myInputModel">
+          <v-text-field
+            v-model="data.time"
+            v-mask="'(###) ###-####'"
+          ></v-text-field> -->
+          <!-- Time -->
+          <v-text-field
+            v-model="tmp_data.time"
+            v-mask="'##:##'"
+            :prepend-icon="icons.clock"
+            outlined
+            placeholder="00:00"
+            dense
+            label="Time"
+            required
+            :rules="rules.timeRequired"
+          ></v-text-field>
+
+           <!-- Tiebreak -->
+          <v-text-field
+            v-model="tmp_data.tiebreak"
+            v-mask="'##:##'"
+            :prepend-icon="icons.tiebreak"
+            outlined
+            placeholder="00:00"
+            dense
+            label="Tie-break"
+            required
+            :rules="rules.tiebreakRequired"
           ></v-text-field>
         </v-form>
         </v-card-text>
@@ -93,8 +125,8 @@
 
 <script>
 import Vue from "vue";
-import { mdiClose, mdiDumbbell, mdiAccount, mdiScoreboard, mdiFirework  } from '@mdi/js';
-import { postScore } from '@/api/score';
+import { mdiClose, mdiDumbbell, mdiAccount, mdiScoreboard, mdiFirework, mdiTimer, mdiTimelapse } from '@mdi/js';
+// import { postScore } from '@/api/score';
 // import { getCompetitors } from '@/api/competitor';
 
 export default Vue.extend({
@@ -106,18 +138,28 @@ export default Vue.extend({
           dumbbell: mdiDumbbell,
           account: mdiAccount,
           scoreboard: mdiScoreboard,
-          firework: mdiFirework 
+          firework: mdiFirework,
+          clock: mdiTimer,
+          tiebreak: mdiTimelapse,
         },
+        myInputModel: false,
         creationLoading : false,
         dialog: false,
         menu: null,
         competition: {},
         competitors: [],
+        tmp_data :{ 
+          // used to store time before sending it to the api in integer
+          time: null,
+          tiebreak: null,
+        },
         data: {
           event: null,
           competitor: null,
           result: null,
-          category: null
+          category: null,
+          time: null,
+          tiebreak: null,
         },
         rules:{
           selectEventRequired: [v => !!v || 'Event is required'],
@@ -126,7 +168,13 @@ export default Vue.extend({
           resultRequired: [
             v => !!v || 'Result is required',
             v => Number.isInteger(Number(v)) || 'You must enter a number'
-            ],
+          ],
+          timeRequired: [
+            v => !!v || 'Time is required'
+          ],
+          tiebreakRequired: [
+            v => !!v || 'Tie-break is required'
+          ],
         }
       }
     },
@@ -143,6 +191,10 @@ export default Vue.extend({
         this.data.competitor = null;
         this.data.result = null;
         this.data.category = null;
+        this.tmp_data.time = null;
+        this.tmp_data.tiebreak = null;
+        this.data.time = null;
+        this.data.tiebreak = null;
 
         return new Promise((resolve, reject) => {
           this.resolve = resolve
@@ -160,17 +212,19 @@ export default Vue.extend({
         var validated = this.$refs.scoreForm.validate();
         // Checking if the form is validated
         if ( validated === true ) {
-          this.creationLoading = true
+          // this.creationLoading = true
+          this.data.tiebreak = this.convertTimeToInteger(this.tmp_data.tiebreak)
+          this.data.time = this.convertTimeToInteger(this.tmp_data.time)
           console.log(this.data)
-          postScore(this.data)
-          .then(response => {
-            console.log(response);
-            this.resolve(true)
-            this.dialog = false
-          })
-          .finally(
-            this.creationLoading = false
-          )
+          // postScore(this.data)
+          // .then(response => {
+          //   console.log(response);
+          //   this.resolve(true)
+          //   this.dialog = false
+          // })
+          // .finally(
+          //   this.creationLoading = false
+          // )
           // Form validated, sending request
           // TODO: send request
         }
@@ -190,6 +244,20 @@ export default Vue.extend({
       saveStartDate(date) {
         this.$refs.menu.save(date)
       },
+      convertTimeToInteger(time) {
+        let timeInteger = 0
+        // Time is a string in format XX:XX
+        if (time !== null && time !== undefined && time.includes(':') ) {
+          const times = time.split(':');
+          // Check that the first number is not equal to 0
+          if (parseInt(times[0]) !== 0 ) { 
+            timeInteger = parseInt(times[0]) * 60 + parseInt(times[1])
+          } else {
+            timeInteger = parseInt(times[1])
+          } 
+        }
+        return timeInteger;
+      }
     }
 });
 </script>
