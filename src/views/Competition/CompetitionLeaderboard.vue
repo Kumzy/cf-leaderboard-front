@@ -95,6 +95,7 @@ import "ag-grid-community/dist/styles/ag-theme-material.css";
 import { AgGridVue } from 'ag-grid-vue';
 import { mdiMagnify, mdiRefresh, mdiAccountPlus, mdiGenderFemale  } from '@mdi/js';
 import { getCompetition, getCompetitionLeaderboard } from '@/api/competition';
+import { convertIntegerToTime } from '@/utils/time.js'
 import ModalCreateResult from '@/components/score/ModalCreateResult.vue'
 
 export default {
@@ -160,7 +161,8 @@ export default {
         sortable: true, 
         resizable: true,
         suppressMovable: true ,
-        headerTooltip: 'Determined by total points. The athlete with the fewest points wins.'
+        headerTooltip: 'Determined by total points. The athlete with the fewest points wins.',
+        valueGetter: 'data.rank', 
       },
       { 
         headerName: 'Name', 
@@ -182,7 +184,8 @@ export default {
         sortable: false, 
         resizable:true,
         suppressMovable: true,
-        headerTooltip: 'The sum of an athlete\'s workout rankings. Based on a points-per-place ranking system.'
+        headerTooltip: 'The sum of an athlete\'s workout rankings. Based on a points-per-place ranking system.',
+        valueGetter: 'data.total_points', 
       },
     ];
     this.rowData = [
@@ -208,32 +211,38 @@ export default {
               editable: false,
               sortable: true,
               resizable:true,
-              comparator: (valueA, valueB, nodeA, nodeB, isInverted) => {
-                console.log(nodeA)
-                console.log(nodeB)
-                console.log(isInverted)
-                // var valA,valB=0;
-                // if ( params && params.colDef && params.colDef.field && params.data.events.length > 0 ) {
-                //  n
-                //   params.data.events.forEach( function( event ){
-                //     if ( event.event_id === params.colDef.field ) {
-                //       // console.log(event)
-                //       result =  ordinal_suffix_of(event.point) + ' ('+event.result +')';
-                //       // return 'yolo';
-                //     }
-                //   } );
-                // }
+              // comparator: (valueA, valueB, nodeA, nodeB, isInverted) => {
+              //   console.log(nodeA)
+              //   console.log(nodeB)
+              //   console.log(isInverted)
+              //   // var valA,valB=0;
+              //   // if ( params && params.colDef && params.colDef.field && params.data.events.length > 0 ) {
+              //   //  n
+              //   //   params.data.events.forEach( function( event ){
+              //   //     if ( event.event_id === params.colDef.field ) {
+              //   //       // console.log(event)
+              //   //       result =  ordinal_suffix_of(event.point) + ' ('+event.result +')';
+              //   //       // return 'yolo';
+              //   //     }
+              //   //   } );
+              //   // }
 
-                if (valueA == valueB) return 0;
-                return (valueA > valueB) ? 1 : -1;
-              },
+              //   if (valueA == valueB) return 0;
+              //   return (valueA > valueB) ? 1 : -1;
+              // },
               suppressMovable: true,
               valueGetter: function(params) {
                 var result = ''
-                if ( params && params.colDef && params.colDef.field && params.data.events.length > 0 ) {
-                  params.data.events.forEach( function( event ){
-                    if ( event.event_id === params.colDef.field ) {
-                      result =  ordinal_suffix_of(event.point) + ' ('+event.result +')';
+                if ( params && params.colDef && params.colDef.field && params.data.scores.length > 0 ) {
+                  params.data.scores.forEach( function( score ){
+                    if ( score.event.id === params.colDef.field ) {
+                      // result = 10;
+                      if ( score.time != score.event.time_cap ) {
+                        result =  ordinal_suffix_of(score.point) + ' ('+convertIntegerToTime(score.time)+')';
+                      } else {
+                        result =  ordinal_suffix_of(score.point) + ' ('+ score.result+' reps)';
+                      }
+                      
                     }
                   } );
                 }
@@ -253,6 +262,7 @@ export default {
       if (this.competition_id !== null && this.competition_id !== undefined && gender_id !== null && gender_id !== undefined ) {
          getCompetitionLeaderboard(this.competition_id,{'gender_id': gender_id })
          .then(response => {
+           console.log(response)
            this.rowData = response.data.items
          })
       }

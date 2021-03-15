@@ -122,6 +122,7 @@ import Vue from "vue";
 import { mdiClose, mdiDumbbell, mdiAccount, mdiScoreboard, mdiFirework, mdiTimer, mdiTimelapse } from '@mdi/js';
 import { postScore, putScore } from '@/api/score';
 import { getCompetition } from '@/api/competition';
+import { convertIntegerToTime, convertTimeToInteger } from '@/utils/time.js'
 // import { getCompetitors } from '@/api/competitor';
 
 export default Vue.extend({
@@ -219,8 +220,8 @@ export default Vue.extend({
 
         // Resetting data  
         // this.data = scoreData;
-        this.tmp_data.time = this.convertIntegerToTime(this.data.time);
-        this.tmp_data.tiebreak = this.convertIntegerToTime(this.data.tiebreak);
+        this.tmp_data.time = convertIntegerToTime(this.data.time);
+        this.tmp_data.tiebreak = convertIntegerToTime(this.data.tiebreak);
                 
         this.editing = true;
 
@@ -239,8 +240,8 @@ export default Vue.extend({
         // Checking if the form is validated
         if ( validated === true ) {
           this.creationLoading = true
-          this.data.tiebreak = this.convertTimeToInteger(this.tmp_data.tiebreak)
-          this.data.time = this.convertTimeToInteger(this.tmp_data.time)
+          this.data.tiebreak = convertTimeToInteger(this.tmp_data.tiebreak)
+          this.data.time = convertTimeToInteger(this.tmp_data.time)
           // console.log(this.data)
           postScore(this.data)
           .then(() => {
@@ -257,8 +258,8 @@ export default Vue.extend({
         // Checking if the form is validated
         if ( validated === true ) {
           this.creationLoading = true
-          this.data.tiebreak = this.convertTimeToInteger(this.tmp_data.tiebreak)
-          this.data.time = this.convertTimeToInteger(this.tmp_data.time)
+          this.data.tiebreak = convertTimeToInteger(this.tmp_data.tiebreak)
+          this.data.time = convertTimeToInteger(this.tmp_data.time)
           // console.log(this.data)
           putScore(this.data,this.data.id)
           .then(() => {
@@ -285,26 +286,6 @@ export default Vue.extend({
       },
       saveStartDate(date) {
         this.$refs.menu.save(date)
-      },
-      convertTimeToInteger(time) {
-        let timeInteger = 0
-        // Time is a string in format XX:XX
-        if (time !== null && time !== undefined && time.includes(':') ) {
-          const times = time.split(':');
-          // Check that the first number is not equal to 0
-          if (parseInt(times[0]) !== 0 ) { 
-            timeInteger = parseInt(times[0]) * 60 + parseInt(times[1])
-          } else {
-            timeInteger = parseInt(times[1])
-          } 
-        }
-        return timeInteger;
-      },
-      convertIntegerToTime(integerTime) {
-        const minutes = Math.floor(integerTime / 60);
-        const seconds = integerTime - minutes * 60;
-        const result = minutes.toLocaleString('fr-FR', { minimumIntegerDigits: 2, useGrouping: false }) + ':' + seconds.toLocaleString('fr-FR', { minimumIntegerDigits: 2, useGrouping: false })
-        return result;
       }
     }
 });
