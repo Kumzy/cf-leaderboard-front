@@ -238,9 +238,9 @@ export default {
                     if ( score.event.id === params.colDef.field ) {
                       // result = 10;
                       if ( score.time != score.event.time_cap ) {
-                        result =  ordinal_suffix_of(score.point) + ' ('+convertIntegerToTime(score.time)+')';
+                        result =  ordinal_suffix_of(score.point) + ' ('+convertIntegerToTime(score.time)+') - '+score.category.name;
                       } else {
-                        result =  ordinal_suffix_of(score.point) + ' ('+ score.result+' reps)';
+                        result =  ordinal_suffix_of(score.point) + ' ('+ score.result+' reps) - '+score.category.name;
                       }
                       
                     }
