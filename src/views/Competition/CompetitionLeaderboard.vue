@@ -79,9 +79,11 @@
       style="width: 100%;"
       class="ag-theme-material"
       :columnDefs="columnDefs"
+      :tooltipShowDelay="tooltipShowDelay"
       :domLayout="domLayout"
       :rowData="rowData"
-      :gridOptions="gridOptions">
+      :gridOptions="gridOptions"
+      :frameworkComponents="frameworkComponents">
       </ag-grid-vue>
    
   </v-container>
@@ -97,6 +99,7 @@ import { mdiMagnify, mdiRefresh, mdiAccountPlus, mdiGenderFemale  } from '@mdi/j
 import { getCompetition, getCompetitionLeaderboard } from '@/api/competition';
 import { convertIntegerToTime } from '@/utils/time.js'
 import ModalCreateResult from '@/components/score/ModalCreateResult.vue'
+// import LeaderboardResultTooltip from '@/components/tooltips/leaderboardResultTooltip.vue';
 
 export default {
   name: 'competition_leaderboard',
@@ -116,6 +119,7 @@ export default {
       justify:'start',
       columnDefs: null,
       rowData: null,
+      tooltipShowDelay: null,
       search: null,
       gridApi: null,
       gridOptions: {
@@ -123,6 +127,7 @@ export default {
         suppressCellSelection: true,
         overlayNoRowsTemplate: 'No results found',
       },
+      frameworkComponents: null,
       data: {},
       competition_id: null,
       genders: [],
@@ -174,6 +179,9 @@ export default {
         resizable:true,
         suppressMovable: true,
         valueGetter: 'data.longname', 
+        tooltipField: 'competitor',
+        // tooltipValueGetter: 'data.longname',
+        // tooltipComponent: 'leaderboardResultTooltip',
       },
       { 
         headerName: 'Points', 
@@ -190,6 +198,9 @@ export default {
     ];
     this.rowData = [
     ];
+
+    // this.tooltipShowDelay = 0;
+    // this.frameworkComponents = { leaderboardResultTooltip: LeaderboardResultTooltip };
     
   },
   methods: {
@@ -237,7 +248,9 @@ export default {
                   params.data.scores.forEach( function( score ){
                     if ( score.event.id === params.colDef.field ) {
                       // result = 10;
-                      if ( score.time != score.event.time_cap ) {
+                      if ( score.not_participated === true ) {
+                        result =  ordinal_suffix_of(score.point) + ' (Not participated)'
+                      }  else if( score.time != score.event.time_cap ) {
                         result =  ordinal_suffix_of(score.point) + ' ('+convertIntegerToTime(score.time)+') - '+score.category.name;
                       } else {
                         result =  ordinal_suffix_of(score.point) + ' ('+ score.result+' reps) - '+score.category.name;
@@ -262,7 +275,7 @@ export default {
       if (this.competition_id !== null && this.competition_id !== undefined && gender_id !== null && gender_id !== undefined ) {
          getCompetitionLeaderboard(this.competition_id,{'gender_id': gender_id })
          .then(response => {
-           console.log(response)
+          //  console.log(response)
            this.rowData = response.data.items
          })
       }
