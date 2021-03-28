@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '@/views/Home.vue'
+import getPageTitle from '@/utils/get-page-title' // Get page title
 
 Vue.use(VueRouter)
 
@@ -21,16 +22,25 @@ const routes = [
   {
     name: 'login',
     path: '/login',
+    meta: { 
+      title: 'Login'
+    },
     component: () => import('@/views/Login/Login.vue')
   },
   {
     path: '/competitions',
     name: 'competitions',
+    meta: { 
+      title: 'Competitions'
+    },
     component: () => import('@/views/Competition/Competitions.vue')
   },
   {
     path: '/competition/:id',
     name: 'competition',
+    meta: { 
+      title: 'Competition'
+    },
     component: () => import(/* webpackChunkName: "about" */ '@/views/Competition/Competition.vue')
   },
   {
@@ -76,6 +86,13 @@ const createRouter = () => new VueRouter({
 })
 
 const router = createRouter()
+
+
+// router.beforeEach(async(to, from, next) => {
+router.beforeEach(async(to,from,next) => {
+  document.title = getPageTitle(to.meta.title)
+  next()
+})
 
 export function resetRouter () {
   const newRouter = createRouter()

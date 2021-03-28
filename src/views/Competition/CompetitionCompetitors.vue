@@ -259,6 +259,7 @@ export default {
       this.refreshLoading = true;
       getCompetition(id).then(response => {
         this.data = response.data.item;
+        this.$route.meta.title = this.data.name + ' competitors';
         this.rowData = this.data.competitors
         this.gridApi.sizeColumnsToFit();
         this.refreshLoading = false

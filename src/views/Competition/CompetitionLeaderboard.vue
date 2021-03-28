@@ -210,8 +210,8 @@ export default {
     getCompetition(id) {
       this.refreshLoading = true;
       getCompetition(id).then(response => {
-        
         this.data = response.data.item;
+        this.$route.meta.title = this.data.name + ' leaderboard';
         if (this.data.events.length > 0 ) {
           for(var i = 0; i < this.data.events.length; i++) {
             this.columnDefs.push({

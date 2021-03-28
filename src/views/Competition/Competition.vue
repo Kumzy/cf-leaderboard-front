@@ -118,6 +118,7 @@ export default {
       this.refreshLoading = true;
       getCompetition(id).then(response => {
         this.data = response.data.item;
+        this.$route.meta.title = this.data.name;
         this.categories = this.data.categories.map(e => e.name).join(' / ')
         this.competitors_amount = this.data.competitors.length
         this.events_amount = this.data.events.length

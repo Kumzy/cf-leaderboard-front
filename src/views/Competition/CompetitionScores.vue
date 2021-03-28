@@ -263,6 +263,7 @@ export default {
       this.refreshLoading = true;
       getCompetition(id).then(response => {
         this.competition = response.data.item;
+        this.$route.meta.title = this.competition.name + ' scores';
         // console.log(this.competition)
       })
     },
