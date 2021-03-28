@@ -160,14 +160,16 @@ export default {
       { 
         headerName: 'Rank', 
         field: 'rank', 
-        width: 200,
-        minWidth: 100,
+        width: 75,
+        minWidth: 50,
+        maxWidth: 100,
         editable: false, 
         sortable: true, 
         resizable: true,
         suppressMovable: true ,
         headerTooltip: 'Determined by total points. The athlete with the fewest points wins.',
         valueGetter: 'data.rank', 
+        cellStyle: {'font-weight': 'bold'}
       },
       { 
         headerName: 'Name', 
@@ -186,8 +188,9 @@ export default {
       { 
         headerName: 'Points', 
         field: 'points', 
-        width: 200,
-        minWidth: 100,
+        width: 75,
+        minWidth: 50,
+        maxWidth: 100,
         editable: false, 
         sortable: false, 
         resizable:true,
@@ -253,7 +256,7 @@ export default {
           this.gridOptions.api.setColumnDefs(this.columnDefs);
         }
         this.setDefaultGender()
-        this.gridApi.sizeColumnsToFit();
+        // this.gridApi.sizeColumnsToFit();
         this.refreshLoading = false
       })
       
@@ -264,6 +267,9 @@ export default {
          .then(response => {
           //  console.log(response)
            this.rowData = response.data.items
+           this.gridApi.sizeColumnsToFit();
+          //  this.gridApi.sizeColumnsToFit();
+          //  this.$forceUpdate();
          })
       }
      
