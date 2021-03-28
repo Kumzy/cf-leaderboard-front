@@ -222,25 +222,12 @@ export default {
               editable: false,
               sortable: true,
               resizable:true,
-              // comparator: (valueA, valueB, nodeA, nodeB, isInverted) => {
-              //   console.log(nodeA)
-              //   console.log(nodeB)
-              //   console.log(isInverted)
-              //   // var valA,valB=0;
-              //   // if ( params && params.colDef && params.colDef.field && params.data.events.length > 0 ) {
-              //   //  n
-              //   //   params.data.events.forEach( function( event ){
-              //   //     if ( event.event_id === params.colDef.field ) {
-              //   //       // console.log(event)
-              //   //       result =  ordinal_suffix_of(event.point) + ' ('+event.result +')';
-              //   //       // return 'yolo';
-              //   //     }
-              //   //   } );
-              //   // }
-
-              //   if (valueA == valueB) return 0;
-              //   return (valueA > valueB) ? 1 : -1;
-              // },
+              comparator: (valueA, valueB) => {
+                let a = parseInt(valueA.substring(0,3))
+                let b = parseInt(valueB.substring(0,3))
+                if (a == b) return 0;
+                return (a > b) ? 1 : -1;
+              },
               suppressMovable: true,
               valueGetter: function(params) {
                 var result = ''
