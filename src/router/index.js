@@ -12,14 +12,6 @@ const routes = [
     component: Home
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  },
-  {
     name: 'login',
     path: '/login',
     meta: { 
@@ -46,32 +38,50 @@ const routes = [
   {
     path: '/competition/:id/competitors',
     name: 'competition_competitors',
+    meta: { 
+      title: 'Competition competitors'
+    },
     component: () => import(/* webpackChunkName: "about" */ '@/views/Competition/CompetitionCompetitors.vue')
   },
   {
     path: '/competition/:id/scores',
     name: 'competition_scores',
+    meta: { 
+      title: 'Competition scores'
+    },
     component: () => import('@/views/Competition/CompetitionScores.vue')
   },
   {
     path: '/competition/:id/leaderboard',
     name: 'competition_leaderboard',
+    meta: { 
+      title: 'Leaderboard'
+    },
     component: () => import(/* webpackChunkName: "about" */ '@/views/Competition/CompetitionLeaderboard.vue')
   },
   {
     path: '/competitors',
     name: 'competitors',
+    meta: { 
+      title: 'Competitors'
+    },
     component: () => import('@/views/Competitor/Competitors.vue')
   },
   {
     path: '/competitors/:id',
     name: 'competitor',
+    meta: { 
+      title: 'Competitor profile'
+    },
     component: () => import('@/views/Competitor/Competitor.vue'),
     props: { editing: true }
   },
   {
     path: '/competitors/add',
     name: 'competitor_add',
+    meta: { 
+      title: 'Add a competitor'
+    },
     component: () => import('@/views/Competitor/Competitor.vue'),
     props: { editing: false }
   }
