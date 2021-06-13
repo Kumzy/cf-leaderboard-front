@@ -84,6 +84,91 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <v-row dense justify="center" align="center" class="mt-5">
+      <v-col>
+    
+        <!-- Leaderboard -->
+        <v-card
+          class="mx-auto"
+          max-width="400"
+        >
+          <v-img
+            class="white--text align-end"
+            height="200px"
+            src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+          >
+            <v-card-title>
+              <v-spacer></v-spacer>
+              <v-btn
+              color="primary"
+              class="text-none"
+              depressed
+              @click="clickLeaderboard"
+            >
+              Live
+            </v-btn></v-card-title>
+          </v-img>
+
+        </v-card>
+      </v-col>
+      
+      <!-- Competitors -->
+      <v-col>
+        <v-card
+          class="mx-auto"
+          max-width="400"
+        >
+          <v-img
+            class="white--text align-end"
+            height="200px"
+            src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+          >
+            <v-card-title>
+              {{ this.teams_amount }} teams
+              <v-spacer></v-spacer>
+              <v-btn
+                color="primary"
+                class="text-none"
+                depressed
+                @click="clickTeams"
+              >
+                Teams
+              </v-btn>
+            </v-card-title>
+          </v-img>
+        </v-card>
+      </v-col>
+
+      <!-- Events -->
+      <!-- <v-col>
+        <v-card
+          class="mx-auto"
+          max-width="400"
+        >
+          <v-img
+            class="white--text align-end"
+            height="200px"
+            src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+          >
+            <v-card-title>
+              {{ this.events_amount }} events - {{ this.categories }}
+              <v-spacer></v-spacer>
+              <v-btn
+                color="primary"
+                class="text-none"
+                depressed
+                disabled
+                @click="clickEvents"
+              >
+                Events
+              </v-btn>
+            </v-card-title>
+          </v-img>
+        </v-card>
+      </v-col> -->
+    </v-row>
+
   </v-container>
 </template>
 
@@ -101,6 +186,7 @@ export default {
       categories: null,
       events_amount: 0,
       competitors_amount: 0,
+      teams_amount: 0,
     };
   },
   created() {
@@ -121,6 +207,7 @@ export default {
         this.$route.meta.title = this.data.name;
         this.categories = this.data.categories.map(e => e.name).join(' / ')
         this.competitors_amount = this.data.competitors.length
+        this.teams_amount = this.data.teams.length
         this.events_amount = this.data.events.length
         this.refreshLoading = false
       })
@@ -128,6 +215,11 @@ export default {
     clickCompetitors() {
       if (this.competition_id) {
         this.$router.push({ name: 'competition_competitors', params: { id: this.competition_id } });
+      }
+    },
+    clickTeams() {
+      if (this.competition_id) {
+        this.$router.push({ name: 'competition_teams', params: { id: this.competition_id } });
       }
     },
     clickLeaderboard() {

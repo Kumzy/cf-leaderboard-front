@@ -46,5 +46,3 @@ export function removeCompetitorFromCompetition(query) {
     params: query
   })
 }
-
-

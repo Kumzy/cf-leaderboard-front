@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <h1>{{ this.data.name }} - Competitors list</h1>
+    <h1>{{ this.data.name }} - Team list</h1>
     <v-row align="center">
       <!-- Left group -->
       <v-col 
@@ -10,7 +10,7 @@
       >
         <v-text-field
           v-model="search"
-          label="Search for a competitor"
+          label="Search for a team/competitor"
           dense
           outlined
           :prepend-inner-icon="searchIcon"
@@ -48,7 +48,7 @@
           class="text-none ml-4"
           style="letter-spacing: normal;"
           color="primary"
-          @click="addCompetitor"
+          @click="addTeam"
         >
           <v-icon
             left
@@ -56,9 +56,9 @@
           >
             {{ addAccountIcon }}
           </v-icon>
-          Add Competitor
+          Add Team
         </v-btn> 
-        <ModalAddCompetitorToCompetition ref="addCompetitorToCompetitionModal"></ModalAddCompetitorToCompetition>
+        <ModalAddTeamToCompetition ref="addTeamToCompetitionModal"></ModalAddTeamToCompetition>
           
       </v-col>
     </v-row>
@@ -83,15 +83,15 @@ import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-material.css";
 import { AgGridVue } from 'ag-grid-vue';
 import { mdiMagnify, mdiRefresh, mdiAccountPlus, mdiGenderFemale  } from '@mdi/js';
-import btnCellRendererCompetitionCompetitors from '@/renderers/BtnCellRendererCompetitionCompetitors.vue';
+// import btnCellRendererCompetitionCompetitors from '@/renderers/BtnCellRendererCompetitionCompetitors.vue';
 import { getCompetition } from '@/api/competition';
-import ModalAddCompetitorToCompetition from '@/components/competition/ModalAddCompetitorToCompetition.vue'
+import ModalAddTeamToCompetition from '@/components/competition/ModalAddTeamToCompetition.vue'
 
 export default {
   name: 'competition_competitors',
   components: {
     AgGridVue,
-    ModalAddCompetitorToCompetition
+    ModalAddTeamToCompetition
   },
   data() {
     return {
@@ -110,10 +110,7 @@ export default {
       gridOptions: {
         suppressRowTransform: true,     
         suppressCellSelection: true,
-        overlayNoRowsTemplate: 'No competitors found',
-        components: {
-          countryCellRenderer: countryCellRenderer,
-        }
+        overlayNoRowsTemplate: 'No teams found',
       },
       data: {},
       competition_id: null,
@@ -144,8 +141,8 @@ export default {
 
     this.columnDefs = [
       { 
-        headerName: 'Firstname', 
-        field: 'firstname', 
+        headerName: 'Team name', 
+        field: 'name', 
         width: 400,
         minWidth: 100,
         editable: false, 
@@ -154,85 +151,26 @@ export default {
         suppressMovable: true 
       },
       { 
-        headerName: 'Lastname', 
-        field: 'lastname', 
+        headerName: 'Competitor #1', 
+        field: 'competitors', 
         width: 400,
         minWidth: 100,
         editable: false, 
         sortable: true, 
         resizable:true,
-        suppressMovable: true 
-      },
-      { 
-        headerName: 'Nationality', 
-        field: 'nationality', 
-        width: 200,
-        minWidth: 100,
-        editable: false, 
-        sortable: false, 
-        resizable:true,
         suppressMovable: true,
-        valueGetter: 'data.nationality.name',
-        cellRenderer: 'countryCellRenderer'
+        valueGetter: 'data.competitors[0].longname',
       },
       { 
-        headerName: 'Age',
-        field: 'birthday_date',
-        width: 100,
-        minWidth: 80,
-        editable: false,
-        sortable: true,
-        resizable:true,
-        suppressMovable: true,
-        valueFormatter:  function(params) {
-          // TODO: Move in a function
-          var today = new Date();
-          var birthDate = new Date(params.value);
-          var age = today.getFullYear() - birthDate.getFullYear();
-          var m = today.getMonth() - birthDate.getMonth();
-          if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) 
-          {
-              age--;
-          }
-          return age;
-        }
-      },
-      { 
-        headerName: 'Gender', 
-        field: 'gender', 
-        width: 200,
-        minWidth: 80,
-        editable: false, 
-        sortable: false, 
-        resizable:true,
-        suppressMovable: true,
-        valueGetter: 'data.gender.name',
-      },
-      { 
-        headerName: 'Height', 
-        field: 'height', 
-        width: 200,
+        headerName: 'Competitor #2', 
+        field: 'competitors', 
+        width: 400,
         minWidth: 100,
         editable: false, 
         sortable: true, 
         resizable:true,
         suppressMovable: true,
-        valueFormatter:  function(params) {
-          return params.value + ' cm';
-        }
-      },
-      { 
-        headerName: 'Weight', 
-        field: 'weight', 
-        width: 200,
-        minWidth: 100,
-        editable: false, 
-        sortable: true, 
-        resizable:true,
-        suppressMovable: true,
-        valueFormatter:  function(params) {
-          return params.value + ' kg';
-        }
+        valueGetter: 'data.competitors[1].longname',
       },
       { 
         headerName: 'Profile', 
@@ -243,8 +181,8 @@ export default {
         sortable: false, 
         resizable:true,
         suppressMovable: true,
-        cellRendererFramework: btnCellRendererCompetitionCompetitors,
-        cellRendererParams: {logged: this.logged},
+        // cellRendererFramework: btnCellRendererCompetitionCompetitors,
+        // cellRendererParams: {logged: this.logged},
       }
     ];
     this.rowData = [
@@ -259,8 +197,8 @@ export default {
       this.refreshLoading = true;
       getCompetition(id).then(response => {
         this.data = response.data.item;
-        this.$route.meta.title = this.data.name + ' competitors';
-        this.rowData = this.data.competitors
+        this.$route.meta.title = this.data.name + ' teams';
+        this.rowData = this.data.teams
         this.gridApi.sizeColumnsToFit();
         this.refreshLoading = false
       })
@@ -274,8 +212,8 @@ export default {
     searchGrid() {
       this.gridApi.setQuickFilter(this.search);
     },
-    addCompetitor() {
-      this.$refs.addCompetitorToCompetitionModal
+    addTeam() {
+      this.$refs.addTeamToCompetitionModal
         .open(this.data)
         .then((resolve) => {
           if (resolve && resolve === true) {
@@ -286,16 +224,6 @@ export default {
   }
 };
 
-function countryCellRenderer(params) {
-  // TODO: Maybe try to use cellRendererParams in coldef to pass directly the iso code instead of retrieveing it from row data
-  // get flags from here: http://www.freeflagicons.com/
-  if (params.value === "" || params.value === undefined || params.value === null || params.data.nationality === null || params.data.nationality.iso2 === null) {
-      return '';
-  } else {
-      var flag = '<img class="flag" border="0" width="15" height="10" src="https://flags.fmcdn.net/data/flags/mini/' + params.data.nationality.iso2 + '.png">';
-      return flag + ' ' + params.value;
-  }
-}
 </script>
 
 <style lang="scss">  
