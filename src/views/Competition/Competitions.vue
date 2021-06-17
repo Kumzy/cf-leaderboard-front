@@ -213,7 +213,7 @@ export default {
     },
     getCompetitions() {
       this.refreshLoading = true;
-      getCompetitions().then(response => {
+      getCompetitions({'active':true}).then(response => {
         this.rowData = response.data.items
         this.gridApi.sizeColumnsToFit();
         //this.refreshLoading = false

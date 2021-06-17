@@ -167,7 +167,7 @@ export default {
         sortable: true, 
         resizable: true,
         suppressMovable: true ,
-        headerTooltip: 'Determined by total points. The athlete with the fewest points wins.',
+        headerTooltip: 'Determined by total points. The team with the fewest points wins.',
         valueGetter: 'data.rank', 
         cellStyle: {'font-weight': 'bold'}
       },
@@ -180,8 +180,8 @@ export default {
         sortable: false, 
         resizable:true,
         suppressMovable: true,
-        valueGetter: 'data.longname', 
-        tooltipField: 'competitor',
+        valueGetter: 'data.name', 
+        tooltipField: 'team',
         // tooltipValueGetter: 'data.longname',
         // tooltipComponent: 'leaderboardResultTooltip',
       },
@@ -195,7 +195,7 @@ export default {
         sortable: false, 
         resizable:true,
         suppressMovable: true,
-        headerTooltip: 'The sum of an athlete\'s workout rankings. Based on a points-per-place ranking system.',
+        headerTooltip: 'The sum of an team\'s workout rankings. Based on a points-per-place ranking system.',
         valueGetter: 'data.total_points', 
       },
     ];
@@ -262,8 +262,8 @@ export default {
       
     },
     getCompetitionLeaderboard(gender_id) {
-      if (this.competition_id !== null && this.competition_id !== undefined && gender_id !== null && gender_id !== undefined ) {
-         getCompetitionLeaderboard(this.competition_id,{'gender_id': gender_id })
+      if (this.competition_id !== null && this.competition_id !== undefined && gender_id !== null && gender_id !== undefined){
+        getCompetitionLeaderboard(this.competition_id,{'gender_id': gender_id })
          .then(response => {
           //  console.log(response)
            this.rowData = response.data.items
@@ -271,6 +271,16 @@ export default {
           //  this.gridApi.sizeColumnsToFit();
           //  this.$forceUpdate();
          })
+      } else if (this.competition_id !== null && this.competition_id !== undefined) {
+        getCompetitionLeaderboard(this.competition_id)
+        .then(response => {
+        //  console.log(response)
+          this.rowData = response.data.items
+          console.log(response.data.items)
+          this.gridApi.sizeColumnsToFit();
+        //  this.gridApi.sizeColumnsToFit();
+        //  this.$forceUpdate();
+        })
       }
      
     },
@@ -278,11 +288,15 @@ export default {
       if (this.data && this.data.genders.length > 0) {
         this.gender = this.data.genders[0]
         this.genderChanged()
+      } else {
+        this.genderChanged()
       }
     },
     genderChanged() {
       if (this.gender !== null && this.gender !== undefined && 'id' in this.gender) {
         this.getCompetitionLeaderboard(this.gender.id)
+      } else {
+        this.getCompetitionLeaderboard()
       }
     },
     refreshData() {

@@ -34,7 +34,22 @@
             required
           ></v-select>
 
-          <!-- Competitor -->
+          <!-- Team -->
+          <v-autocomplete
+            v-model="data.team"
+            return-object
+            outlined
+            dense
+            label="Team"
+            :items="competition.teams"
+            :prepend-icon="icons.group"
+            item-text="name"
+            clearable
+            :rules="rules.selectTeamRequired"
+            required
+          >
+          </v-autocomplete>
+          <!-- Competitor
           <v-autocomplete
             v-model="data.competitor"
             return-object
@@ -48,7 +63,7 @@
             :rules="rules.selectCompetitorRequired"
             required
           >
-          </v-autocomplete>
+          </v-autocomplete> -->
 
           <!-- Category -->
           <v-radio-group
@@ -119,11 +134,11 @@
 
 <script>
 import Vue from "vue";
-import { mdiClose, mdiDumbbell, mdiAccount, mdiScoreboard, mdiFirework, mdiTimer, mdiTimelapse } from '@mdi/js';
+import { mdiClose, mdiDumbbell, mdiAccountGroup , mdiScoreboard, mdiFirework, mdiTimer, mdiTimelapse } from '@mdi/js';
 import { postScore, putScore } from '@/api/score';
 import { getCompetition } from '@/api/competition';
 import { convertIntegerToTime, convertTimeToInteger } from '@/utils/time.js'
-// import { getCompetitors } from '@/api/competitor';
+// import { getTeams } from '@/api/team';
 
 export default Vue.extend({
     name: 'ModalCreateResult',
@@ -133,7 +148,7 @@ export default Vue.extend({
         icons:{
           close: mdiClose,
           dumbbell: mdiDumbbell,
-          account: mdiAccount,
+          group: mdiAccountGroup,
           scoreboard: mdiScoreboard,
           firework: mdiFirework,
           clock: mdiTimer,
@@ -153,7 +168,7 @@ export default Vue.extend({
         },
         data: {
           event: null,
-          competitor: null,
+          team: null,
           result: null,
           category: null,
           time: null,
@@ -186,7 +201,7 @@ export default Vue.extend({
 
         // Resetting data  
         this.data.event = null;
-        this.data.competitor = null;
+        this.data.team = null;
         this.data.result = null;
         this.data.category = null;
         this.tmp_data.time = null;
@@ -211,7 +226,7 @@ export default Vue.extend({
 
         // Resetting data  
         this.data.event = scoreData.event;
-        this.data.competitor = scoreData.competitor;
+        this.data.team = scoreData.team;
         this.data.result = scoreData.result;
         this.data.category = scoreData.category;
         this.data.time = scoreData.time;
