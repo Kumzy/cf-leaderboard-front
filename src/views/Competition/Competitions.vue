@@ -156,7 +156,7 @@ export default {
         suppressMovable: true 
       },
       { 
-        headerName: '# Competitors', 
+        headerName: '# Competitors / # teams', 
         field: 'competitors', 
         width: 200,
         minWidth: 100,
@@ -164,11 +164,32 @@ export default {
         sortable: true, 
         resizable:true,
         suppressMovable: true,
-        valueFormatter:  function(params) {
-          if (params.value === "" || params.value === undefined || params.value === null || params.value.length == 0) {
-            return '-';
+        valueGetter: function(params) {
+          var amountCompetitors, amountTeams = 0
+          if (params.data !== undefined && params.data !== null ) {
+            if (params.data.competitors === "" || params.data.competitors === undefined || params.data.competitors === null || params.data.competitors.length == 0) {
+              amountCompetitors = 0
+            }
+            else {
+              amountCompetitors = params.data.competitors.length;
+            }
+          }
+          if (params.data !== undefined && params.data !== null ) {
+            if (params.data.teams === "" || params.data.teams === undefined || params.data.teams === null || params.data.teams.length == 0) {
+              amountTeams = 0
+            }
+            else {
+              amountTeams = params.data.teams.length;
+            }
+          }
+          if (amountTeams > 0 && amountCompetitors > 0) {
+            return amountTeams +' teams' - amountCompetitors +' competitors'
+          } else if (amountTeams > 0) {
+            return amountTeams +' teams'
+          } else if (amountCompetitors > 0) {
+            return amountCompetitors +' competitors'
           } else {
-            return params.value.length;
+            return '-';
           }
         }
       },
