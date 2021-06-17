@@ -241,7 +241,7 @@ export default {
                       if ( score.not_participated === true ) {
                         result =  ordinal_suffix_of(score.point) + ' (Not participated)'
                       }  else if( score.time != score.event.time_cap ) {
-                        result =  ordinal_suffix_of(score.point) + ' ('+convertIntegerToTime(score.time)+') - '+score.category.name;
+                        result =  ordinal_suffix_of(score.point) + ' ('+convertIntegerToTime(score.time)+' - ' + score.result+' reps) - '+score.category.name;
                       } else {
                         result =  ordinal_suffix_of(score.point) + ' ('+ score.result+' reps) - '+score.category.name;
                       }
