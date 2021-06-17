@@ -67,7 +67,7 @@
 
     <ag-grid-vue
       id="competitorsGrid"
-      style="width: 100%;"
+      :style="{width, height}"
       class="ag-theme-material"
       :columnDefs="columnDefs"
       :domLayout="domLayout"
@@ -109,6 +109,8 @@ export default {
       rowData: null,
       search: null,
       gridApi: null,
+      height: '100%',
+      width: '100%',
       gridOptions: {
         suppressRowTransform: true,     
         suppressCellSelection: true,
