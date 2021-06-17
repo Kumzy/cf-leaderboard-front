@@ -1,83 +1,16 @@
 <template>
   <v-container fluid>
-    <h1>Competition {{ this.data.name }} - Leaderboard</h1>
-      <v-row align="center">
-        <!-- Left group -->
-        <v-col 
-          class="d-flex"
-          cols="12"
-          sm="3"
-        >
-          <!-- <v-text-field
-            v-model="search"
-            label="Search for a competitor"
-            solo
-            dense
-            :prepend-inner-icon="searchIcon"
-            clearable
-            @input="searchGrid"
-          >
-          </v-text-field> -->
-          <!-- Gender -->
-          <v-select
-            :items="data.genders"
-            v-model="gender"
-            item-text="name"
-            return-object
-            label="Division"
-            dense
-            outlined
-            @change="genderChanged"
-          ></v-select>
-          
-        </v-col>
-
-        <!-- Right group -->
-        <v-col class="text-right">
-
-          <!-- Button refresh -->
-          <v-btn
-            :loading="refreshLoading"
-            :disabled="refreshLoading"
-            color="blue-grey"
-            class="text-none ml-4 white--text"
-            style="letter-spacing: normal;"
-            @click="refreshData"
-          >
-            <v-icon
-              left
-              dark
-            >
-              {{ refreshIcon }}
-            </v-icon>
-            Refresh
-          </v-btn>
-
-          <!-- Button add -->
-          <v-btn
-            v-if="logged"
-            class="text-none ml-4"
-            style="letter-spacing: normal;"
-            color="primary"
-            @click="addResult"
-          >
-            <v-icon
-              left
-              dark
-            >
-              {{ addAccountIcon }}
-            </v-icon>
-            Add result
-          </v-btn> 
-          <ModalCreateResult ref="createResultModal"></ModalCreateResult>
-           
-        </v-col>
-      </v-row>
+    <v-banner color="#DADADA"
+      single-line
+      sticky
+    >Updated every 2 minutes.</v-banner>
+    <h1>Competition {{ this.data.name }} - Live feed</h1>
 
     <ag-grid-vue
       id="competitionGrid"
+      ref="grid"
       style="width: 100%;"
-      class="ag-theme-material"
+      class="ag-theme-material js-loop"
       :columnDefs="columnDefs"
       :tooltipShowDelay="tooltipShowDelay"
       :domLayout="domLayout"
@@ -85,7 +18,6 @@
       :gridOptions="gridOptions"
       :frameworkComponents="frameworkComponents">
       </ag-grid-vue>
-   
   </v-container>
 
 </template>
@@ -98,14 +30,13 @@ import { AgGridVue } from 'ag-grid-vue';
 import { mdiMagnify, mdiRefresh, mdiAccountPlus, mdiGenderFemale  } from '@mdi/js';
 import { getCompetition, getCompetitionLeaderboard } from '@/api/competition';
 import { convertIntegerToTime } from '@/utils/time.js'
-import ModalCreateResult from '@/components/score/ModalCreateResult.vue'
+
 // import LeaderboardResultTooltip from '@/components/tooltips/leaderboardResultTooltip.vue';
 
 export default {
   name: 'competition_leaderboard',
   components: {
-    AgGridVue,
-    ModalCreateResult
+    AgGridVue
   },
   data() {
     return {
@@ -132,7 +63,10 @@ export default {
       competition_id: null,
       genders: [],
       gender: null,
-      logged: false
+      logged: false,
+      scrolledToBottom: false,
+      timer: null,
+      timerRefresh: null,
     };
   },
   created() {
@@ -146,12 +80,22 @@ export default {
     if (this.competition_id && this.competition_id !== undefined && this.competition_id !== null ) {
       this.getCompetition(this.competition_id);
     }
+    
+    window.addEventListener('scroll', this.reCalc);
+    window.addEventListener('resize', this.reCalc);
+  },
+  beforeDestroy() {
+    clearInterval(this.timer);
+    clearInterval(this.timerRefresh);
   },
   destroyed() {
-    window.removeEventListener("resize", this.windowResized);
+    window.removeEventListener("resize", this.reCalc);
+    window.removeEventListener('scroll', this.reCalc);
+    window.addEventListener('resize', this.scrollUpdate);
   },
   mounted() {
     this.gridApi = this.gridOptions.api;
+    this.createTimer();
   },
   beforeMount() {
     this.domLayout = 'autoHeight';
@@ -210,6 +154,14 @@ export default {
     windowResized() {
       this.gridApi.sizeColumnsToFit();
     },
+    createTimer() {
+      this.timer = setInterval(() => {
+          window.scrollTo(0,window.document.documentElement.scrollTop+1);
+        }, 50)
+      this.timerRefresh = setInterval(() => {
+          this.getCompetitionLeaderboard()
+        }, 120000)
+    },
     getCompetition(id) {
       this.refreshLoading = true;
       getCompetition(id).then(response => {
@@ -266,7 +218,7 @@ export default {
         getCompetitionLeaderboard(this.competition_id,{'gender_id': gender_id })
          .then(response => {
           //  console.log(response)
-           this.rowData = response.data.items
+           this.rowData = response.data.items;
            this.gridApi.sizeColumnsToFit();
           //  this.gridApi.sizeColumnsToFit();
           //  this.$forceUpdate();
@@ -274,22 +226,21 @@ export default {
       } else if (this.competition_id !== null && this.competition_id !== undefined) {
         getCompetitionLeaderboard(this.competition_id)
         .then(response => {
-        //  console.log(response)
-          this.rowData = response.data.items
-          // console.log(response.data.items)
+          this.rowData = response.data.items;
           this.gridApi.sizeColumnsToFit();
         //  this.gridApi.sizeColumnsToFit();
         //  this.$forceUpdate();
+          this.scrolledToBottom = false;
         })
       }
      
     },
     setDefaultGender() {
       if (this.data && this.data.genders.length > 0) {
-        this.gender = this.data.genders[0]
-        this.genderChanged()
+        this.gender = this.data.genders[0];
+        this.genderChanged();
       } else {
-        this.genderChanged()
+        this.genderChanged();
       }
     },
     genderChanged() {
@@ -302,9 +253,6 @@ export default {
     refreshData() {
       this.genderChanged()
     },
-    generate() {
-     
-    },
     searchGrid() {
       this.gridApi.setQuickFilter(this.search);
     },
@@ -316,6 +264,17 @@ export default {
             this.refreshData();
           }
         })
+    },
+    reCalc() {
+        let bottomOfWindow = Math.max(window.pageYOffset, window.document.documentElement.scrollTop, window.document.body.scrollTop) + window.innerHeight === window.document.documentElement.offsetHeight
+        if (bottomOfWindow) {
+          this.scrolledToBottom = true
+          window.scrollTo(0,0);
+          this.scrolledToBottom = false
+        } else {
+          this.scrolledToBottom = false
+        }
+    
     }
   }
 };
@@ -348,6 +307,8 @@ function ordinal_suffix_of(i) {
     }
     return i + "th";
 }
+
+
 
 // function genderCellRenderer(params) {
 //   if (params.value === "" || params.value === undefined || params.value === null || params.data.gender === null) {

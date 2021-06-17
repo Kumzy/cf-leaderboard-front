@@ -69,6 +69,14 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '@/views/Competition/CompetitionLeaderboard.vue')
   },
   {
+    path: '/competition/:id/live',
+    name: 'competition_live',
+    meta: { 
+      title: 'Live Leaderboard'
+    },
+    component: () => import(/* webpackChunkName: "about" */ '@/views/Competition/CompetitionLive.vue')
+  },
+  {
     path: '/competitors',
     name: 'competitors',
     meta: { 

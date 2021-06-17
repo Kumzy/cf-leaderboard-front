@@ -88,7 +88,7 @@
     <v-row dense justify="center" align="center" class="mt-5">
       <v-col>
     
-        <!-- Leaderboard -->
+        <!-- Live -->
         <v-card
           class="mx-auto"
           max-width="400"
@@ -104,7 +104,7 @@
               color="primary"
               class="text-none"
               depressed
-              @click="clickLeaderboard"
+              @click="clickLive"
             >
               Live
             </v-btn></v-card-title>
@@ -225,6 +225,11 @@ export default {
     clickLeaderboard() {
       if (this.competition_id) {
         this.$router.push({ name: 'competition_leaderboard', params: { id: this.competition_id } });
+      }
+    },
+    clickLive() {
+      if (this.competition_id) {
+        this.$router.push({ name: 'competition_live', params: { id: this.competition_id } });
       }
     },
     clickEvents() {
