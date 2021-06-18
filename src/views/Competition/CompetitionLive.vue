@@ -5,19 +5,20 @@
       sticky
     >Updated every 2 minutes.</v-banner>
     <h1>Competition {{ this.data.name }} - Live feed</h1>
-
-    <ag-grid-vue
-      id="competitionGrid"
-      ref="grid"
-      style="width: 100%;"
-      class="ag-theme-material js-loop"
-      :columnDefs="columnDefs"
-      :tooltipShowDelay="tooltipShowDelay"
-      :domLayout="domLayout"
-      :rowData="rowData"
-      :gridOptions="gridOptions"
-      :frameworkComponents="frameworkComponents">
-      </ag-grid-vue>
+      <ag-grid-vue
+        id="competitionGrid"
+        ref="grid"
+        style="width: 100%;"
+        class="ag-theme-material"
+        :columnDefs="columnDefs"
+        :tooltipShowDelay="tooltipShowDelay"
+        :domLayout="domLayout"
+        :rowData="rowData"
+        :gridOptions="gridOptions"
+        :frameworkComponents="frameworkComponents">
+        </ag-grid-vue>
+        <!-- Div added so we can see the last rows before going up again -->
+        <div style="height: 150px;"></div> 
   </v-container>
 
 </template>
@@ -266,6 +267,7 @@ export default {
         })
     },
     reCalc() {
+        
         let bottomOfWindow = Math.max(window.pageYOffset, window.document.documentElement.scrollTop, window.document.body.scrollTop) + window.innerHeight === window.document.documentElement.offsetHeight
         if (bottomOfWindow) {
           this.scrolledToBottom = true
